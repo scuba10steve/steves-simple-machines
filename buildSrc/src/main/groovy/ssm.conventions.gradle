@@ -28,8 +28,13 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "net.neoforged:neoforge:${neoforge_version}"
 }
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
+
+    // Add the main compile output to the test runtime classpath
+    classpath += sourceSets.main.output
+    classpath += configurations.compileClasspath
 }
