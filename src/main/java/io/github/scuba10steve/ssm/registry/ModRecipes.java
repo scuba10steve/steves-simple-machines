@@ -1,6 +1,7 @@
 package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.recipe.CrushingRecipe;
+import io.github.scuba10steve.ssm.recipe.SawingRecipe;
 import io.github.scuba10steve.ssm.ref.RefStrings;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +28,17 @@ public class ModRecipes {
 
     public static final Supplier<CrushingRecipe.Serializer> CRUSHING_SERIALIZER =
             RECIPE_SERIALIZERS.register("crushing", CrushingRecipe.Serializer::new);
+
+    public static final Supplier<RecipeType<SawingRecipe>> SAWING_TYPE =
+            RECIPE_TYPES.register("sawing", () -> new RecipeType<SawingRecipe>() {
+                @Override
+                public String toString() {
+                    return ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "sawing").toString();
+                }
+            });
+
+    public static final Supplier<SawingRecipe.Serializer> SAWING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("sawing", SawingRecipe.Serializer::new);
 
     public static void register(IEventBus bus) {
         RECIPE_TYPES.register(bus);

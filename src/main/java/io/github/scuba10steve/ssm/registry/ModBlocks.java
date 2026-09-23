@@ -21,6 +21,11 @@ public class ModBlocks {
                     (pos, state) -> new ProcessingMachineBlockEntity(ModBlockEntities.CRUSHER.get(), pos, state, MachineConfigs.CRUSHER),
                     BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
 
+    public static final Supplier<ProcessingMachineBlock> SAWMILL = BLOCKS.register("sawmill", () ->
+            new ProcessingMachineBlock(
+                    (pos, state) -> new ProcessingMachineBlockEntity(ModBlockEntities.SAWMILL.get(), pos, state, MachineConfigs.SAWMILL),
+                    BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
+
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
     }

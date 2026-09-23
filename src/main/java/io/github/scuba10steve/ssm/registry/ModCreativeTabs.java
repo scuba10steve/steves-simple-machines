@@ -23,6 +23,8 @@ public class ModCreativeTabs {
                         output.accept(ModItems.CRUSHED_IRON.get());
                         output.accept(ModItems.CRUSHED_GOLD.get());
                         output.accept(ModItems.CRUSHED_COPPER.get());
+                        output.accept(ModItems.SAWMILL.get());
+                        output.accept(ModItems.SAWDUST.get());
                     })
                     .build());
 

@@ -17,6 +17,10 @@ public class ModMenuTypes {
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
                     (containerId, inv, buf) -> new ProcessingMachineMenu(ModMenuTypes.CRUSHER.get(), containerId, inv, buf)));
 
+    public static final Supplier<MenuType<ProcessingMachineMenu>> SAWMILL = MENU_TYPES.register("sawmill", () ->
+            net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                    (containerId, inv, buf) -> new ProcessingMachineMenu(ModMenuTypes.SAWMILL.get(), containerId, inv, buf)));
+
     public static void register(IEventBus bus) {
         MENU_TYPES.register(bus);
     }

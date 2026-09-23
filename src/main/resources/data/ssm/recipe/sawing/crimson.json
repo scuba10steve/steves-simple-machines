@@ -1,0 +1,8 @@
+{
+  "type": "ssm:sawing",
+  "input": { "item": "minecraft:crimson_stem" },
+  "planks_result": { "id": "minecraft:crimson_planks" },
+  "planks_count": 6,
+  "sawdust_result": { "id": "ssm:sawdust" },
+  "sawdust_count": 1
+}

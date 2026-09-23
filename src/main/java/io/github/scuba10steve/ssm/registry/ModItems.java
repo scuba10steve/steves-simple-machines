@@ -20,6 +20,11 @@ public class ModItems {
     public static final Supplier<Item> CRUSHER = ITEMS.register("crusher",
             () -> new BlockItem(ModBlocks.CRUSHER.get(), new Item.Properties()));
 
+    public static final Supplier<Item> SAWDUST = ITEMS.register("sawdust", () -> new Item(new Item.Properties()));
+
+    public static final Supplier<Item> SAWMILL = ITEMS.register("sawmill",
+            () -> new BlockItem(ModBlocks.SAWMILL.get(), new Item.Properties()));
+
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

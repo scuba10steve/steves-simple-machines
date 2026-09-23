@@ -20,6 +20,12 @@ public class ModBlockEntities {
                             new ProcessingMachineBlockEntity(ModBlockEntities.CRUSHER.get(), pos, state, MachineConfigs.CRUSHER),
                             ModBlocks.CRUSHER.get()).build(null));
 
+    public static final Supplier<BlockEntityType<ProcessingMachineBlockEntity>> SAWMILL =
+            BLOCK_ENTITIES.register("sawmill", () ->
+                    BlockEntityType.Builder.of((pos, state) ->
+                            new ProcessingMachineBlockEntity(ModBlockEntities.SAWMILL.get(), pos, state, MachineConfigs.SAWMILL),
+                            ModBlocks.SAWMILL.get()).build(null));
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }

@@ -17,7 +17,7 @@ public class ModClientSetup {
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.CRUSHER.get(), ProcessingMachineScreen::new);
-        // Task 8 adds: event.register(ModMenuTypes.SAWMILL.get(), ProcessingMachineScreen::new);
+        event.register(ModMenuTypes.SAWMILL.get(), ProcessingMachineScreen::new);
         // Task 9 adds: event.register(ModMenuTypes.SMELTER.get(), ProcessingMachineScreen::new);
         // Tasks 10-13 each add their own generator MenuType/Screen pair.
     }

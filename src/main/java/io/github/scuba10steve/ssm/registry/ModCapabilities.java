@@ -17,5 +17,13 @@ public class ModCapabilities {
                 net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.CRUSHER.get(),
                 (be, side) -> be.inventory);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.SAWMILL.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.SAWMILL.get(),
+                (be, side) -> be.inventory);
     }
 }
