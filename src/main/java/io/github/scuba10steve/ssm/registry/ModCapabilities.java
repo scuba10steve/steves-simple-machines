@@ -1,6 +1,5 @@
 package io.github.scuba10steve.ssm.registry;
 
-import io.github.scuba10steve.ssm.ref.RefStrings;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 

@@ -34,7 +34,7 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 
-    // Add the main compile output to the test runtime classpath
-    classpath += sourceSets.main.output
-    classpath += configurations.compileClasspath
+    // Make main compiled classes and their dependencies available to tests.
+    // This includes the deobfuscated NeoForge classes from moddev processing.
+    classpath += sourceSets.main.runtimeClasspath
 }
