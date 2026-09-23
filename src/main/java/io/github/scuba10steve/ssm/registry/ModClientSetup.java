@@ -1,5 +1,6 @@
 package io.github.scuba10steve.ssm.registry;
 
+import io.github.scuba10steve.ssm.generator.CombustionGeneratorScreen;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineScreen;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -19,6 +20,7 @@ public class ModClientSetup {
         event.register(ModMenuTypes.CRUSHER.get(), ProcessingMachineScreen::new);
         event.register(ModMenuTypes.SAWMILL.get(), ProcessingMachineScreen::new);
         event.register(ModMenuTypes.SMELTER.get(), ProcessingMachineScreen::new);
-        // Tasks 10-13 each add their own generator MenuType/Screen pair.
+        event.register(ModMenuTypes.COMBUSTION_GENERATOR.get(), CombustionGeneratorScreen::new);
+        // Tasks 11-13 each add their own generator MenuType/Screen pair.
     }
 }

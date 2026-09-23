@@ -33,5 +33,13 @@ public class ModCapabilities {
                 net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.SMELTER.get(),
                 (be, side) -> be.inventory);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.COMBUSTION_GENERATOR.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.COMBUSTION_GENERATOR.get(),
+                (be, side) -> be.fuelHandler);
     }
 }
