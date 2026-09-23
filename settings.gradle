@@ -16,3 +16,4 @@ plugins {
 }
 
 rootProject.name = 'steves-simple-machines'
+include 'gametest'

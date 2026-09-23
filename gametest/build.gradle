@@ -1,0 +1,34 @@
+plugins {
+    id 'ssm.conventions'
+}
+
+evaluationDependsOn(':')
+
+version = rootProject.mod_version
+group = 'io.github.scuba10steve.ssm.test'
+
+// 'ssm.conventions' already applies 'net.neoforged.moddev' and enables modding (with a
+// version) for this project; re-setting neoForge.version here would trip NeoGradle's
+// "cannot enable modding in the same project twice" guard, so this block only adds to
+// the runs/mods the convention already configured.
+neoForge {
+    runs {
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'ssm'
+        }
+    }
+
+    mods {
+        // 'ssm.conventions' already adds this project's own sourceSets.main to the 'ssm' mod;
+        // only the root project's main sourceSet (the actual game content) needs adding here.
+        ssm {
+            modSourceSets.add(providers.provider { project(':').sourceSets.main })
+        }
+    }
+}
+
+dependencies {
+    implementation project(':')
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.14.4"
+}

@@ -27,6 +27,9 @@ jobs:
       - name: Build and test
         run: ./gradlew build
 
+      - name: Run GameTests
+        run: ./gradlew :gametest:runGameTestServer
+
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
