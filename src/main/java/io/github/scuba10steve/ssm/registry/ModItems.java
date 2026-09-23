@@ -37,6 +37,9 @@ public class ModItems {
     public static final Supplier<Item> WATER_WHEEL = ITEMS.register("water_wheel",
             () -> new BlockItem(ModBlocks.WATER_WHEEL.get(), new Item.Properties()));
 
+    public static final Supplier<Item> WIND_TURBINE = ITEMS.register("wind_turbine",
+            () -> new BlockItem(ModBlocks.WIND_TURBINE.get(), new Item.Properties()));
+
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

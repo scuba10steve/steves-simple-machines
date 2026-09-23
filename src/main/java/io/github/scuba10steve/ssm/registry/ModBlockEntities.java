@@ -3,6 +3,7 @@ package io.github.scuba10steve.ssm.registry;
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.SolarPanelBlockEntity;
 import io.github.scuba10steve.ssm.generator.WaterWheelBlockEntity;
+import io.github.scuba10steve.ssm.generator.WindTurbineBlockEntity;
 import io.github.scuba10steve.ssm.machine.MachineConfigs;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineBlockEntity;
 import io.github.scuba10steve.ssm.ref.RefStrings;
@@ -49,6 +50,11 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("water_wheel", () ->
                     BlockEntityType.Builder.of(WaterWheelBlockEntity::new,
                             ModBlocks.WATER_WHEEL.get()).build(null));
+
+    public static final Supplier<BlockEntityType<WindTurbineBlockEntity>> WIND_TURBINE =
+            BLOCK_ENTITIES.register("wind_turbine", () ->
+                    BlockEntityType.Builder.of(WindTurbineBlockEntity::new,
+                            ModBlocks.WIND_TURBINE.get()).build(null));
 
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
