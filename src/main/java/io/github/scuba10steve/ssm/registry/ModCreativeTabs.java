@@ -27,6 +27,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.SAWDUST.get());
                         output.accept(ModItems.SMELTER.get());
                         output.accept(ModItems.COMBUSTION_GENERATOR.get());
+                        output.accept(ModItems.SOLAR_PANEL.get());
                     })
                     .build());
 

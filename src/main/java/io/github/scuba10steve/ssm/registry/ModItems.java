@@ -31,6 +31,9 @@ public class ModItems {
     public static final Supplier<Item> COMBUSTION_GENERATOR = ITEMS.register("combustion_generator",
             () -> new BlockItem(ModBlocks.COMBUSTION_GENERATOR.get(), new Item.Properties()));
 
+    public static final Supplier<Item> SOLAR_PANEL = ITEMS.register("solar_panel",
+            () -> new BlockItem(ModBlocks.SOLAR_PANEL.get(), new Item.Properties()));
+
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

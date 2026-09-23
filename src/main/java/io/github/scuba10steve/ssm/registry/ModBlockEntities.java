@@ -1,6 +1,7 @@
 package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
+import io.github.scuba10steve.ssm.generator.SolarPanelBlockEntity;
 import io.github.scuba10steve.ssm.machine.MachineConfigs;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineBlockEntity;
 import io.github.scuba10steve.ssm.ref.RefStrings;
@@ -37,6 +38,11 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("combustion_generator", () ->
                     BlockEntityType.Builder.of(CombustionGeneratorBlockEntity::new,
                             ModBlocks.COMBUSTION_GENERATOR.get()).build(null));
+
+    public static final Supplier<BlockEntityType<SolarPanelBlockEntity>> SOLAR_PANEL =
+            BLOCK_ENTITIES.register("solar_panel", () ->
+                    BlockEntityType.Builder.of(SolarPanelBlockEntity::new,
+                            ModBlocks.SOLAR_PANEL.get()).build(null));
 
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);

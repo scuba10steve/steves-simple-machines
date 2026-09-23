@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GRG",
+    "III"
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass_pane" },
+    "R": { "item": "minecraft:redstone" },
+    "I": { "item": "minecraft:iron_ingot" }
+  },
+  "result": { "id": "ssm:solar_panel", "count": 1 }
+}
