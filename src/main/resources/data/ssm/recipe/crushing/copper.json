@@ -1,0 +1,6 @@
+{
+  "type": "ssm:crushing",
+  "input": { "tag": "c:raw_materials/copper" },
+  "result": { "id": "ssm:crushed_copper", "count": 1 },
+  "output_count": 2
+}

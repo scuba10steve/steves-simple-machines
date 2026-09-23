@@ -9,8 +9,13 @@ public class ModCapabilities {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        // Tasks 5, 10, 11, 12, 13 each add one or more
-        // event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, <TYPE>, (be, side) -> be.energyStorage);
-        // lines here once their block entity types exist.
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.CRUSHER.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.CRUSHER.get(),
+                (be, side) -> be.inventory);
     }
 }

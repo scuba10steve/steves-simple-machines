@@ -15,6 +15,7 @@ public class Ssm {
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModRecipes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModCapabilities.register(modEventBus);
         ModClientSetup.register(modEventBus);

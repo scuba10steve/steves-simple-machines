@@ -17,9 +17,12 @@ public class ModCreativeTabs {
     public static final Supplier<CreativeModeTab> SSM_TAB = TABS.register("ssm_tab", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.ssm"))
-                    .icon(() -> ItemStack.EMPTY) // Task 7 replaces this with the Crusher item once registered
+                    .icon(() -> new ItemStack(ModItems.CRUSHER.get()))
                     .displayItems((params, output) -> {
-                        // Later tasks call output.accept(...) for each registered item.
+                        output.accept(ModItems.CRUSHER.get());
+                        output.accept(ModItems.CRUSHED_IRON.get());
+                        output.accept(ModItems.CRUSHED_GOLD.get());
+                        output.accept(ModItems.CRUSHED_COPPER.get());
                     })
                     .build());
 
