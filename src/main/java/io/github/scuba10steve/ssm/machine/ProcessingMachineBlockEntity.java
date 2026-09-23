@@ -4,18 +4,50 @@ import io.github.scuba10steve.ssm.energy.SimpleEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class ProcessingMachineBlockEntity extends BlockEntity {
+public class ProcessingMachineBlockEntity extends BlockEntity implements MenuProvider {
 
     public final MachineConfig config;
     public final ItemStackHandler inventory;
     public final SimpleEnergyStorage energyStorage;
     private final ProcessingMachineState state;
+
+    // ContainerData slots: 0 = progress, 1 = processTicks, 2-3 = energy (lo/hi), 4-5 = capacity (lo/hi)
+    public final ContainerData containerData = new ContainerData() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> getProgress();
+                case 1 -> config.baseProcessTicks().getAsInt();
+                case 2 -> energyStorage.getEnergyStored() & 0xFFFF;
+                case 3 -> (energyStorage.getEnergyStored() >> 16) & 0xFFFF;
+                case 4 -> energyStorage.getMaxEnergyStored() & 0xFFFF;
+                case 5 -> (energyStorage.getMaxEnergyStored() >> 16) & 0xFFFF;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            // Client-authoritative fields only; server drives all of these, nothing to set.
+        }
+
+        @Override
+        public int getCount() {
+            return 6;
+        }
+    };
 
     public ProcessingMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState, MachineConfig config) {
         super(type, pos, blockState);
@@ -37,6 +69,16 @@ public class ProcessingMachineBlockEntity extends BlockEntity {
 
     public int getProgress() {
         return state.getProgress();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.ssm." + config.id());
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player player) {
+        return new ProcessingMachineMenu(config.menuType().get(), id, playerInventory, this);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState blockState, ProcessingMachineBlockEntity be) {
