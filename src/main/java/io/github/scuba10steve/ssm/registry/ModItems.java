@@ -25,6 +25,9 @@ public class ModItems {
     public static final Supplier<Item> SAWMILL = ITEMS.register("sawmill",
             () -> new BlockItem(ModBlocks.SAWMILL.get(), new Item.Properties()));
 
+    public static final Supplier<Item> SMELTER = ITEMS.register("smelter",
+            () -> new BlockItem(ModBlocks.SMELTER.get(), new Item.Properties()));
+
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
     }

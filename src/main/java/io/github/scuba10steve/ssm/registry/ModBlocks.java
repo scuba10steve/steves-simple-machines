@@ -26,6 +26,11 @@ public class ModBlocks {
                     (pos, state) -> new ProcessingMachineBlockEntity(ModBlockEntities.SAWMILL.get(), pos, state, MachineConfigs.SAWMILL),
                     BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
 
+    public static final Supplier<ProcessingMachineBlock> SMELTER = BLOCKS.register("smelter", () ->
+            new ProcessingMachineBlock(
+                    (pos, state) -> new ProcessingMachineBlockEntity(ModBlockEntities.SMELTER.get(), pos, state, MachineConfigs.SMELTER),
+                    BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
+
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);
     }

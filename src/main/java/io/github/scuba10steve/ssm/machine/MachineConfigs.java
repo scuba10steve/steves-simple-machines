@@ -5,6 +5,7 @@ import io.github.scuba10steve.ssm.recipe.CrushingRecipe;
 import io.github.scuba10steve.ssm.recipe.SawingRecipe;
 import io.github.scuba10steve.ssm.registry.ModRecipes;
 import io.github.scuba10steve.ssm.registry.ModMenuTypes;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 
 import java.util.Optional;
@@ -24,6 +25,23 @@ public class MachineConfigs {
             SsmConfig.CRUSHER_ENERGY_PER_TICK::get,
             SsmConfig.CRUSHER_PROCESS_TICKS::get,
             ModMenuTypes.CRUSHER
+    );
+
+    public static final MachineConfig SMELTER = new MachineConfig(
+            "smelter",
+            (level, input) -> {
+                SingleRecipeInput recipeInput = new SingleRecipeInput(input);
+                return level.getRecipeManager()
+                        .getRecipeFor(RecipeType.SMELTING, recipeInput, level)
+                        .map(holder -> holder.value().assemble(recipeInput, level.registryAccess()))
+                        .filter(result -> !result.isEmpty())
+                        .map(result -> SmelterAdapter.toMachineResult(result, SsmConfig.SMELTER_PROCESS_TICKS.get()));
+            },
+            1,
+            SsmConfig.SMELTER_CAPACITY::get,
+            SsmConfig.SMELTER_ENERGY_PER_TICK::get,
+            SsmConfig.SMELTER_PROCESS_TICKS::get,
+            ModMenuTypes.SMELTER
     );
 
     public static final MachineConfig SAWMILL = new MachineConfig(

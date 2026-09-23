@@ -25,6 +25,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.CRUSHED_COPPER.get());
                         output.accept(ModItems.SAWMILL.get());
                         output.accept(ModItems.SAWDUST.get());
+                        output.accept(ModItems.SMELTER.get());
                     })
                     .build());
 

@@ -21,6 +21,10 @@ public class ModMenuTypes {
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
                     (containerId, inv, buf) -> new ProcessingMachineMenu(ModMenuTypes.SAWMILL.get(), containerId, inv, buf)));
 
+    public static final Supplier<MenuType<ProcessingMachineMenu>> SMELTER = MENU_TYPES.register("smelter", () ->
+            net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                    (containerId, inv, buf) -> new ProcessingMachineMenu(ModMenuTypes.SMELTER.get(), containerId, inv, buf)));
+
     public static void register(IEventBus bus) {
         MENU_TYPES.register(bus);
     }

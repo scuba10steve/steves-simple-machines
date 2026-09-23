@@ -26,6 +26,12 @@ public class ModBlockEntities {
                             new ProcessingMachineBlockEntity(ModBlockEntities.SAWMILL.get(), pos, state, MachineConfigs.SAWMILL),
                             ModBlocks.SAWMILL.get()).build(null));
 
+    public static final Supplier<BlockEntityType<ProcessingMachineBlockEntity>> SMELTER =
+            BLOCK_ENTITIES.register("smelter", () ->
+                    BlockEntityType.Builder.of((pos, state) ->
+                            new ProcessingMachineBlockEntity(ModBlockEntities.SMELTER.get(), pos, state, MachineConfigs.SMELTER),
+                            ModBlocks.SMELTER.get()).build(null));
+
     public static void register(IEventBus bus) {
         BLOCK_ENTITIES.register(bus);
     }
