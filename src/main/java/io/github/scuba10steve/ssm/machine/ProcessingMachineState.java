@@ -10,7 +10,7 @@ import java.util.Optional;
 /** Progress/inventory state machine for a processing machine, extracted so it's testable without a live Level. */
 public class ProcessingMachineState {
 
-    /** energyConsumed is true only on a tick that actually advanced progress or attempted completion — never on a tick spent only waiting for output space. */
+    /** energyConsumed is true only on a tick that actually incremented progress — never on a tick spent parked at completion waiting for output space. */
     public record TickOutcome(boolean completed, boolean energyConsumed) {}
 
     private final ItemStackHandler inventory;

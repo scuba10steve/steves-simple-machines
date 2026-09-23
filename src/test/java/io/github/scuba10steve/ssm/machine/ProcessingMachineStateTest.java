@@ -112,12 +112,13 @@ class ProcessingMachineStateTest {
 
     @Test
     void twoOutputsThatIndividuallyFitMayStillNotFitTogether() {
-        // Two output slots, each already 63/64 full of a DIFFERENT item than either result —
-        // each result alone would fit in "a" slot considered independently, but there are only
-        // 2 free single-item slots total and this recipe needs 2 slots for 2 distinct new items,
-        // so simulating them independently against the same starting state (as a naive
-        // per-output simulate-in-isolation implementation would) wrongly reports success twice
-        // against slot 1 instead of reserving slot 1 for the first output and slot 2 for the second.
+        // Two output slots, both starting completely empty. The point of this test is that a
+        // naive per-output-in-isolation simulation (checking "does this fit anywhere?" against
+        // an unmodified copy of the starting state for EACH output) would let both outputs claim
+        // "slot 1" as their landing spot, since each individually fits in the first empty slot it
+        // sees. The correct implementation threads a running scratch state through all outputs in
+        // one simulation pass, so the first output's claim on slot 1 is visible when the second
+        // output is considered, correctly routing it to slot 2 instead.
         ItemStack input = new ItemStack(Items.OAK_LOG, 1);
         ItemStack planks = new ItemStack(Items.OAK_PLANKS, 6);
         ItemStack sawdust = new ItemStack(Items.STICK, 1); // stand-in for ssm:sawdust
@@ -125,9 +126,6 @@ class ProcessingMachineStateTest {
 
         ItemStackHandler inventory = new ItemStackHandler(3); // 1 input + 2 output slots
         inventory.setStackInSlot(0, input);
-        // Both output slots start completely empty; the point is that a per-output-in-isolation
-        // simulation would let BOTH outputs claim "slot 1" as their landing spot, so verify the
-        // real implementation actually lands them in two distinct slots.
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 2, fixedResultLookup(input, result));
         ProcessingMachineState.TickOutcome outcome = state.tick(null, true);
@@ -139,5 +137,36 @@ class ProcessingMachineStateTest {
         boolean slot2HasPlanks = inventory.getStackInSlot(2).is(Items.OAK_PLANKS) && inventory.getStackInSlot(2).getCount() == 6;
         assertTrue((slot1HasPlanks && slot2HasSawdust) || (slot1HasSawdust && slot2HasPlanks),
                 "both outputs must land, each in its own slot, with nothing dropped");
+    }
+
+    @Test
+    void combinedOutputsRequiringDistinctSlotsMustAllFitOrNoneAreInserted() {
+        // Unlike the test above, this scenario has only ONE truly free output slot, but the
+        // recipe needs TWO slots for two distinct new items. This is the case that actually
+        // distinguishes cumulative simulation from a naive per-output-independent check: a naive
+        // implementation that tests each output "does this fit anywhere?" against a fresh,
+        // unmodified copy of the live inventory would see the one free slot as available for
+        // EACH output considered on its own, and wrongly report both as fitting. The correct
+        // cumulative check must recognize that only one of the two outputs can actually claim
+        // that single free slot, so the whole batch must be rejected and the machine held at
+        // completion — same as pausesAtCompletionWhenOutputSlotFull, but reached via insufficient
+        // combined capacity across multiple outputs rather than one already-full slot.
+        ItemStack input = new ItemStack(Items.OAK_LOG, 1);
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS, 6);
+        ItemStack sawdust = new ItemStack(Items.STICK, 1); // stand-in for ssm:sawdust
+        MachineRecipeResult result = new MachineRecipeResult(List.of(planks, sawdust), 1);
+
+        ItemStackHandler inventory = new ItemStackHandler(3); // 1 input + 2 output slots
+        inventory.setStackInSlot(0, input);
+        // Slot 1 is full of an unrelated item (matches neither output), leaving slot 2 as the
+        // only free slot — but two distinct new items need two distinct slots.
+        inventory.setStackInSlot(1, new ItemStack(Items.COBBLESTONE, 64));
+
+        ProcessingMachineState state = new ProcessingMachineState(inventory, 2, fixedResultLookup(input, result));
+        ProcessingMachineState.TickOutcome outcome = state.tick(null, true);
+
+        assertFalse(outcome.completed(), "only one free slot exists for two distinct new-item outputs");
+        assertFalse(inventory.getStackInSlot(0).isEmpty(), "input must not be consumed when not all outputs fit together");
+        assertEquals(1, state.getProgress(), "progress holds at the completion point");
     }
 }
