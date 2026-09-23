@@ -6,6 +6,10 @@ base {
     archivesName = 'ssm'
 }
 
+dependencies {
+    runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.27.0.340"
+}
+
 processResources {
     def replaceProperties = [
         mod_version: mod_version,
