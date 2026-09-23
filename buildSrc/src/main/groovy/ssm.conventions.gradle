@@ -20,6 +20,17 @@ neoForge {
             server()
         }
     }
+
+    mods {
+        ssm {
+            sourceSet sourceSets.main
+        }
+    }
+
+    unitTest {
+        enable()
+        testedMod = mods.ssm
+    }
 }
 
 dependencies {
@@ -28,13 +39,8 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation "net.neoforged:neoforge:${neoforge_version}"
 }
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
-
-    // Make main compiled classes and their dependencies available to tests.
-    // This includes the deobfuscated NeoForge classes from moddev processing.
-    classpath += sourceSets.main.runtimeClasspath
 }

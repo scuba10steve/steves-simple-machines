@@ -1,0 +1,70 @@
+package io.github.scuba10steve.ssm.machine;
+
+import io.github.scuba10steve.ssm.energy.SimpleEnergyStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
+public class ProcessingMachineBlockEntity extends BlockEntity {
+
+    public final MachineConfig config;
+    public final ItemStackHandler inventory;
+    public final SimpleEnergyStorage energyStorage;
+    private final ProcessingMachineState state;
+
+    public ProcessingMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState, MachineConfig config) {
+        super(type, pos, blockState);
+        this.config = config;
+        // No isItemValid override here: ItemStackHandler.insertItem consults isItemValid
+        // internally regardless of caller, so overriding it to reject output slots would
+        // also block the machine's OWN completion logic from ever inserting its results.
+        // Player-facing "outputs aren't inputs" is enforced instead at the Slot layer, in
+        // ProcessingMachineMenu (Task 6), via SlotItemHandler#mayPlace.
+        this.inventory = new ItemStackHandler(1 + config.outputSlotCount()) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                setChanged();
+            }
+        };
+        this.energyStorage = new SimpleEnergyStorage(config.energyCapacity().getAsInt(), Integer.MAX_VALUE, 0);
+        this.state = new ProcessingMachineState(inventory, config.outputSlotCount(), config.recipeLookup());
+    }
+
+    public int getProgress() {
+        return state.getProgress();
+    }
+
+    public static void tick(Level level, BlockPos pos, BlockState blockState, ProcessingMachineBlockEntity be) {
+        if (level.isClientSide()) {
+            return;
+        }
+        int perTick = be.config.energyPerTick().getAsInt();
+        boolean hasEnergy = be.energyStorage.getEnergyStored() >= perTick;
+        ProcessingMachineState.TickOutcome outcome = be.state.tick(level, hasEnergy);
+        if (outcome.energyConsumed()) {
+            be.energyStorage.extractEnergy(perTick, false);
+        }
+        be.setChanged();
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt("energy", energyStorage.getEnergyStored());
+        tag.putInt("progress", getProgress());
+        tag.put("inventory", inventory.serializeNBT(registries));
+    }
+
+    @Override
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        energyStorage.setEnergy(tag.getInt("energy"));
+        inventory.deserializeNBT(registries, tag.getCompound("inventory"));
+        state.setProgress(tag.getInt("progress"));
+    }
+}
