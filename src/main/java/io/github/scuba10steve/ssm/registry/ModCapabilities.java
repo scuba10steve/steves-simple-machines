@@ -45,5 +45,9 @@ public class ModCapabilities {
                 net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.SOLAR_PANEL.get(),
                 (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.WATER_WHEEL.get(),
+                (be, side) -> be.energyStorage);
     }
 }

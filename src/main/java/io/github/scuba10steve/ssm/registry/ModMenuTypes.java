@@ -2,6 +2,7 @@ package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorMenu;
 import io.github.scuba10steve.ssm.generator.SolarPanelMenu;
+import io.github.scuba10steve.ssm.generator.WaterWheelMenu;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineMenu;
 import io.github.scuba10steve.ssm.ref.RefStrings;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -34,6 +35,10 @@ public class ModMenuTypes {
     public static final Supplier<MenuType<SolarPanelMenu>> SOLAR_PANEL = MENU_TYPES.register("solar_panel", () ->
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
                     (containerId, inv, buf) -> new SolarPanelMenu(ModMenuTypes.SOLAR_PANEL.get(), containerId, inv, buf)));
+
+    public static final Supplier<MenuType<WaterWheelMenu>> WATER_WHEEL = MENU_TYPES.register("water_wheel", () ->
+            net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                    (containerId, inv, buf) -> new WaterWheelMenu(ModMenuTypes.WATER_WHEEL.get(), containerId, inv, buf)));
 
     public static void register(IEventBus bus) {
         MENU_TYPES.register(bus);
