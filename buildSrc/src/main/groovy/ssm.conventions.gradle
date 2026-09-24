@@ -5,7 +5,7 @@ plugins {
 }
 
 version = rootProject.mod_version
-group = 'io.github.scuba10steve.ssm'
+group = 'io.github.scuba10steve'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 

@@ -5,7 +5,7 @@ plugins {
 evaluationDependsOn(':')
 
 version = rootProject.mod_version
-group = 'io.github.scuba10steve.ssm.test'
+group = 'io.github.scuba10steve'
 
 // 'ssm.conventions' already applies 'net.neoforged.moddev' and enables modding (with a
 // version) for this project; re-setting neoForge.version here would trip NeoGradle's
