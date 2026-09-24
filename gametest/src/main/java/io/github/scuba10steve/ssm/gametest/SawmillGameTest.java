@@ -47,4 +47,26 @@ public class SawmillGameTest {
             helper.succeed();
         });
     }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void sawmillPausesWhenOutputBufferIsFullWithoutLosingInput(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.SAWMILL.get());
+        ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
+        be.inventory.setStackInSlot(0, new ItemStack(Items.OAK_LOG));
+        // Sawdust output slot already full: a multi-output recipe needs ALL its outputs to fit,
+        // so a full sawdust slot must block the whole operation even though the planks slot is empty.
+        be.inventory.setStackInSlot(2, new ItemStack(ModItems.SAWDUST.get(), 64));
+        be.energyStorage.receiveEnergy(100_000, false);
+
+        helper.runAfterDelay(120, () -> {
+            helper.assertTrue(!be.inventory.getStackInSlot(0).isEmpty(),
+                    "input must not be consumed while one of the outputs has no room");
+            helper.assertTrue(be.inventory.getStackInSlot(1).isEmpty(),
+                    "planks slot must stay empty since the paired sawdust output could not fit");
+            helper.assertTrue(be.inventory.getStackInSlot(2).getCount() == 64,
+                    "sawdust slot must remain exactly 64, nothing duplicated or lost");
+            helper.succeed();
+        });
+    }
 }

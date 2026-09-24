@@ -44,4 +44,23 @@ public class SmelterGameTest {
             helper.succeed();
         });
     }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void smelterPausesWhenOutputBufferIsFullWithoutLosingInput(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.SMELTER.get());
+        ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
+        be.inventory.setStackInSlot(0, new ItemStack(ModItems.CRUSHED_IRON.get()));
+        // Output slot already full: no room for the iron_ingot the recipe would produce.
+        be.inventory.setStackInSlot(1, new ItemStack(Items.IRON_INGOT, 64));
+        be.energyStorage.receiveEnergy(100_000, false);
+
+        helper.runAfterDelay(120, () -> {
+            helper.assertTrue(!be.inventory.getStackInSlot(0).isEmpty(),
+                    "input must not be consumed while output has no room");
+            helper.assertTrue(be.inventory.getStackInSlot(1).getCount() == 64,
+                    "output slot must remain exactly 64, nothing duplicated or lost");
+            helper.succeed();
+        });
+    }
 }
