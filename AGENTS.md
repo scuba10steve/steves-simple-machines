@@ -49,8 +49,9 @@ steves-simple-machines/
                                    SMELTER, SAWMILL), SmelterAdapter
     recipe/                       Custom recipe types: CrushingRecipe, SawingRecipe (Smelter reuses vanilla
                                    minecraft:smelting)
-    generator/                    The 4 generators, each its own BlockEntity + Menu + Screen, sharing
-                                   GeneratorBlock<T>: CombustionGeneratorBlockEntity (+ CombustionBurnState),
+    generator/                    The 4 generators, each its own Menu + Screen, sharing GeneratorBlock<T> and the
+                                   abstract GeneratorBlockEntity base (FE buffer, push-to-neighbor loop, energy NBT,
+                                   ContainerData lo/hi helpers): CombustionGeneratorBlockEntity (+ CombustionBurnState),
                                    SolarPanelBlockEntity, WaterWheelBlockEntity (+ AdjacentWaterCheck),
                                    WindTurbineBlockEntity (+ SkyColumnCheck)
     compat/jei/                   SsmJeiPlugin, CrushingCategory, SawingCategory (see jei-integration.md)
@@ -68,7 +69,7 @@ steves-simple-machines/
     build.gradle                   Applies ssm.conventions, adds root project's main sourceSet to the ssm mod
     src/main/java/io/github/scuba10steve/ssm/gametest/
                                     CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest
-                                    (14 gametests total)
+                                    (18 gametests total)
 
   docs/dev/                        This documentation
   AGENTS.md, README.md, CHANGELOG.md, cliff.toml

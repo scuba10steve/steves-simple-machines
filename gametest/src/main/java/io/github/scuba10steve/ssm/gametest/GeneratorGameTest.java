@@ -135,6 +135,24 @@ public class GeneratorGameTest {
         });
     }
 
+    @GameTest(template = "empty")
+    public static void waterWheelDoesNotReportGeneratingWhenBufferFull(GameTestHelper helper) {
+        // Regression test for the drift where currentlyGenerating tracked "is the condition met"
+        // instead of "was energy actually accepted": a full buffer must report not-generating even
+        // though the environmental condition (adjacent water) is met.
+        helper.setBlock(POS, ModBlocks.WATER_WHEEL.get());
+        WaterWheelBlockEntity be = (WaterWheelBlockEntity) helper.getBlockEntity(POS);
+        be.energyStorage.generate(be.energyStorage.getMaxEnergyStored());
+        helper.setBlock(POS.relative(Direction.NORTH), Blocks.WATER);
+
+        helper.runAfterDelay(10, () -> {
+            helper.assertTrue(be.energyStorage.getEnergyStored() == be.energyStorage.getMaxEnergyStored(),
+                    "expected buffer to remain full");
+            helper.assertTrue(!be.isGenerating(), "expected wheel to not report generating when buffer is full");
+            helper.succeed();
+        });
+    }
+
     // --- Wind Turbine ---
 
     @GameTest(template = "empty")
@@ -160,6 +178,24 @@ public class GeneratorGameTest {
         // enclosure's sky-light change finishes propagating would otherwise never drain away.
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(!be.isGenerating(), "expected turbine to not be generating under a roof");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
+    public static void windTurbineDoesNotReportGeneratingWhenBufferFull(GameTestHelper helper) {
+        // Regression test for the drift where currentlyGenerating tracked "is the condition met"
+        // instead of "was energy actually accepted": a full buffer must report not-generating even
+        // though the environmental condition (clear sky) is met.
+        helper.setBlock(POS, ModBlocks.WIND_TURBINE.get());
+        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(POS);
+        be.energyStorage.generate(be.energyStorage.getMaxEnergyStored());
+        // Clear sky above by default in the empty test arena.
+
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(be.energyStorage.getEnergyStored() == be.energyStorage.getMaxEnergyStored(),
+                    "expected buffer to remain full");
+            helper.assertTrue(!be.isGenerating(), "expected turbine to not report generating when buffer is full");
             helper.succeed();
         });
     }

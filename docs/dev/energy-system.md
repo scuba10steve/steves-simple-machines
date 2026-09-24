@@ -56,20 +56,25 @@ exposed to hoppers/cables/other mods without this registration.
 ## Push-to-neighbor pattern (generators)
 
 Machines are pure sinks — something else must push FE into them. All 4 generators push their own generated energy
-out, on their own tick, rather than waiting to be pulled from. Every generator's `tick(...)` static method ends with
-the same loop (shown here from `SolarPanelBlockEntity`, but identical in `CombustionGeneratorBlockEntity`,
-`WaterWheelBlockEntity`, and `WindTurbineBlockEntity`):
+out, on their own tick, rather than waiting to be pulled from. This loop, along with the FE buffer itself, the
+NBT round-trip, and the lo/hi `ContainerData` bit-packing, lives once in the shared abstract base
+`GeneratorBlockEntity` (`src/main/java/io/github/scuba10steve/ssm/generator/GeneratorBlockEntity.java`) that
+`CombustionGeneratorBlockEntity`, `SolarPanelBlockEntity`, `WaterWheelBlockEntity`, and `WindTurbineBlockEntity` all
+extend. Each `tick(...)` static method ends by calling the inherited helper:
 
 ```java
-if (be.energyStorage.getEnergyStored() > 0) {
+protected final void pushEnergyToNeighbors(Level level, BlockPos pos, int maxOutput) {
+    if (energyStorage.getEnergyStored() <= 0) {
+        return;
+    }
     for (Direction dir : Direction.values()) {
         IEnergyStorage neighbour = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
         if (neighbour != null && neighbour.canReceive()) {
-            int toSend = Math.min(be.energyStorage.getEnergyStored(), maxOutput);
+            int toSend = Math.min(energyStorage.getEnergyStored(), maxOutput);
             int sent = neighbour.receiveEnergy(toSend, false);
             if (sent > 0) {
-                be.energyStorage.extractEnergy(sent, false);
-                be.setChanged();
+                energyStorage.extractEnergy(sent, false);
+                setChanged();
             }
         }
     }
@@ -89,6 +94,9 @@ Notes on this pattern:
 - `setChanged()` is only called when energy actually moved (`sent > 0`), avoiding redundant chunk-dirty marking on
   ticks where every neighbor's buffer happened to be full.
 
-If you add a new generator, copy this loop verbatim into its `tick(...)` — there is no shared "generator ticker"
-helper for it (unlike `ProcessingMachineState`, this logic hasn't been extracted into a reusable class since all 4
-call sites are still small and identical; see `docs/dev/generators.md` for what *does* differ between them).
+`GeneratorBlockEntity` also exposes `generateAndMarkChanged(int amount)`, which each generator's condition logic
+must route through instead of calling `energyStorage.generate(...)` directly: it returns `true` only if energy was
+actually accepted (not merely if the environmental condition was met), and callers drive their "am I generating"
+state from that return value. This is what keeps a full-buffer generator from reporting itself as generating
+forever (see `docs/dev/generators.md`) — a new generator gets this for free by extending the base class, rather
+than needing to get the buffer-full edge case right on its own.

@@ -1,11 +1,17 @@
 # Generators
 
-There are 4 generators, each with its own `BlockEntity`/`Menu`/`Screen` (unlike the 3 machines, which share one
-implementation — generators differ enough in condition logic and per-tick behavior that a shared `GeneratorConfig`
-wasn't worth the indirection). All 4 share `GeneratorBlock<T>` (block-level plumbing: `newBlockEntity`, `getTicker`,
-opening the menu on right-click) and the push-to-neighbor energy pattern described in
-[energy-system.md](./energy-system.md). What differs is each one's *condition logic* — what has to be
-true, each tick, for it to generate.
+There are 4 generators, each with its own `Menu`/`Screen` and its own `BlockEntity` subclass (unlike the 3 machines,
+which share one implementation — generators differ enough in condition logic and per-tick behavior that a shared
+`GeneratorConfig` wasn't worth the indirection). All 4 share `GeneratorBlock<T>` (block-level plumbing:
+`newBlockEntity`, `getTicker`, opening the menu on right-click) and the abstract `GeneratorBlockEntity` base class
+(the FE buffer, the push-to-neighbor energy pattern described in [energy-system.md](./energy-system.md), the energy
+NBT round-trip, and the lo/hi `ContainerData` bit-packing helpers). What differs per generator is its *condition
+logic* — what has to be true, each tick, for it to generate — and each one's own `ContainerData` slot layout.
+
+Every generator's condition logic must report "am I generating" (and mark the block entity as changed) based on
+whether `GeneratorBlockEntity#generateAndMarkChanged(int)` actually accepted energy that tick, never based on the
+environmental condition alone — a full buffer is a legitimate reason to stop reporting "generating," and this
+invariant used to be duplicated (and drift) independently in each generator before `GeneratorBlockEntity` existed.
 
 ## Combustion Generator
 
@@ -66,9 +72,9 @@ rate only while both conditions hold; it's zeroed the instant either fails, incl
 Condition, in `WaterWheelBlockEntity.tick`: generates whenever any of the 6 orthogonally adjacent blocks is a water
 source or flowing water. The check itself is the pure, unit-tested `AdjacentWaterCheck.hasAdjacentWater(List<FluidState>)`
 — the block entity gathers `level.getFluidState(pos.relative(dir))` for all 6 directions and hands the list to the
-helper, keeping the "is any neighbor water" predicate testable without a `Level` (`AdjacentWaterCheckTest`). Unlike
-the Solar Panel and Combustion Generator, there's no buffer-related pause here: `generate(...)`'s own clamping to
-`capacity - energy` already makes a full buffer a safe no-op.
+helper, keeping the "is any neighbor water" predicate testable without a `Level` (`AdjacentWaterCheckTest`).
+`isGenerating()` reflects `adjacentWater && generateAndMarkChanged(rate)`, so a full buffer correctly reports
+not-generating even while water remains adjacent (`GeneratorGameTest#waterWheelDoesNotReportGeneratingWhenBufferFull`).
 
 ## Wind Turbine
 
@@ -79,6 +85,10 @@ Condition, in `WindTurbineBlockEntity.tick`: generates whenever the column above
 single vanilla sky-visibility check at one position, so the block entity doesn't route through it. If a future
 change needs a multi-block-tall clearance check (e.g. requiring N clear blocks above rather than just sky visibility
 from the block itself), wire `WindTurbineBlockEntity` through `SkyColumnCheck` at that point.
+
+Like the Water Wheel, `isGenerating()` reflects `clearToSky && generateAndMarkChanged(rate)`, so a full buffer
+correctly reports not-generating even under clear sky
+(`GeneratorGameTest#windTurbineDoesNotReportGeneratingWhenBufferFull`).
 
 ## Config-driven rates
 
