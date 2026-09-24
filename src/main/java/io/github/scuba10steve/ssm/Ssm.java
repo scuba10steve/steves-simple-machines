@@ -10,7 +10,7 @@ import net.neoforged.fml.common.Mod;
 @Mod(RefStrings.MODID)
 public class Ssm {
     public Ssm(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, SsmConfig.SPEC, "ssm-common.toml");
+        modContainer.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModBlockEntities.register(modEventBus);

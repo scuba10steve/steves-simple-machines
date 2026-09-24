@@ -1,11 +1,11 @@
 # Configuration System
 
 Steve's Simple Machines uses NeoForge's `ModConfigSpec` system to generate a TOML configuration file, written to
-**`config/ssm-common.toml`** the first time the mod loads. It is registered as a **server** config
-(`ModConfig.Type.SERVER`), not `COMMON` — see `Ssm`'s constructor:
+**`config/ssm-common.toml`** the first time the mod loads. It is registered as a **common** config
+(`ModConfig.Type.COMMON`) — see `Ssm`'s constructor:
 
 ```java
-modContainer.registerConfig(ModConfig.Type.SERVER, SsmConfig.SPEC, "ssm-common.toml");
+modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
 ```
 
 ## Configuration File Structure
@@ -72,7 +72,7 @@ output (generators).
 
 ```java
 // Ssm.java
-modContainer.registerConfig(ModConfig.Type.SERVER, SsmConfig.SPEC, "ssm-common.toml");
+modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
 ```
 
 There is no platform-abstraction layer here (unlike `steves-simple-storage`'s `S3Config` interface) — this is a
@@ -87,8 +87,8 @@ int energyPerTick = SsmConfig.CRUSHER_ENERGY_PER_TICK.get();
 Follow the existing per-section pattern in `SsmConfig`'s static initializer: `builder.comment("Name").push("id")`,
 one or more `builder.comment(...).defineInRange(...)` calls, then `builder.pop()`. Add the corresponding
 `ModConfigSpec.IntValue` fields alongside the existing ones, and wire them into the new `MachineConfig` entry (see
-[docs/dev/machine-framework.md](docs/dev/machine-framework.md)) or generator block entity (see
-[docs/dev/generators.md](docs/dev/generators.md)).
+[machine-framework.md](./machine-framework.md)) or generator block entity (see
+[generators.md](./generators.md)).
 
 ## Troubleshooting
 

@@ -120,7 +120,7 @@ processResources {
 ```
 
 The `runtimeOnly` JEI dependency lives only here, not in the shared convention plugin — see
-[docs/dev/jei-integration.md](docs/dev/jei-integration.md) for why `gametest/` deliberately doesn't get it.
+[jei-integration.md](./jei-integration.md) for why `gametest/` deliberately doesn't get it.
 
 ### `gametest/build.gradle`
 
@@ -240,5 +240,5 @@ not currently gate on a specific branch or run on pull requests separately.
 
 ## Troubleshooting
 
-See [docs/dev/troubleshooting.md](docs/dev/troubleshooting.md) for build failures, missing symbols, and gametest
+See [troubleshooting.md](./troubleshooting.md) for build failures, missing symbols, and gametest
 issues.

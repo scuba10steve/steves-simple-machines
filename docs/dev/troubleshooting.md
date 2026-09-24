@@ -96,7 +96,7 @@ adapter/logic pieces directly (e.g. `SmelterAdapter`) and defer the full end-to-
 
 This is expected, not a bug: `ProcessingMachineState` **parks** at `progress == processTicks` when the output slots
 don't have room for the recipe's outputs, and stops charging energy while parked (see
-[docs/dev/machine-framework.md](docs/dev/machine-framework.md)). Empty an output slot and the machine will complete
+[machine-framework.md](./machine-framework.md)). Empty an output slot and the machine will complete
 the operation on its next tick.
 
 ### A generator seems to "waste" fuel/sunlight/wind when its buffer is full
@@ -109,14 +109,14 @@ The Combustion Generator is the one case where consuming a *resource* (burn time
 wasteful, and it's handled explicitly: `CombustionBurnState.tick` returns early without decrementing
 `remainingBurnTime` when `bufferRoom <= 0`. This is an intentional divergence from `steves-advanced-storage`'s
 `CoalGeneratorBlockEntity`, which does burn down (and waste) fuel with a full buffer — see
-[docs/dev/generators.md](docs/dev/generators.md) for the full comparison.
+[generators.md](./generators.md) for the full comparison.
 
 ### Energy pushed to a neighbor isn't showing up
 
 Confirm the neighbor's `BlockEntityType` actually has `Capabilities.EnergyStorage.BLOCK` registered in
 `ModCapabilities` — a `BlockEntity` with an `energyStorage` field but no `registerBlockEntity(...)` call is invisible
 to `level.getCapability(Capabilities.EnergyStorage.BLOCK, ...)` and will never receive a push (see
-[docs/dev/energy-system.md](docs/dev/energy-system.md)).
+[energy-system.md](./energy-system.md)).
 
 ## JEI Integration Issues
 
@@ -126,13 +126,13 @@ to `level.getCapability(Capabilities.EnergyStorage.BLOCK, ...)` and will never r
    `SsmJeiPlugin` — a category alone with no recipes registered against it renders empty.
 2. If it reuses an existing recipe type (vanilla or `ssm`), it needs **only** a `registerRecipeCatalysts` entry
    pointing at that type — see the Smelter's catalyst-only pattern in
-   [docs/dev/jei-integration.md](docs/dev/jei-integration.md). Adding a redundant category for an already-covered
+   [jei-integration.md](./jei-integration.md). Adding a redundant category for an already-covered
    recipe type causes duplicate JEI entries, not missing ones.
 
 ### JEI integration breaks the build/runtime when JEI isn't present
 
 It shouldn't — JEI is `compileOnly` + `runtimeOnly` only (see
-[docs/dev/jei-integration.md](docs/dev/jei-integration.md)). If a compile error or a `NoClassDefFoundError` appears
+[jei-integration.md](./jei-integration.md)). If a compile error or a `NoClassDefFoundError` appears
 without JEI installed, something outside `compat/jei/` is importing a JEI class unconditionally; move that usage
 behind the same dependency boundary.
 

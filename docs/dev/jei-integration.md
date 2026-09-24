@@ -32,7 +32,7 @@ drawn from the machine's own `ItemStack`, and a translatable title (`jei.ssm.cru
 
 **The Smelter gets no new category.** Smelting recipes already have a perfectly good JEI category — vanilla's own
 `RecipeTypes.SMELTING`. Since the Smelter block just runs vanilla `minecraft:smelting` recipes (see
-[docs/dev/machine-framework.md](docs/dev/machine-framework.md)), duplicating that as a third `ssm` category would
+[machine-framework.md](./machine-framework.md)), duplicating that as a third `ssm` category would
 show every smeltable item twice in JEI for no benefit. Instead, the Smelter is registered purely as a **catalyst** —
 "this block is a valid place to use this vanilla category's recipes" — without touching `registerCategories` or
 `registerRecipes` for smelting at all:

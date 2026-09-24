@@ -4,7 +4,7 @@ There are 4 generators, each with its own `BlockEntity`/`Menu`/`Screen` (unlike 
 implementation — generators differ enough in condition logic and per-tick behavior that a shared `GeneratorConfig`
 wasn't worth the indirection). All 4 share `GeneratorBlock<T>` (block-level plumbing: `newBlockEntity`, `getTicker`,
 opening the menu on right-click) and the push-to-neighbor energy pattern described in
-[docs/dev/energy-system.md](docs/dev/energy-system.md). What differs is each one's *condition logic* — what has to be
+[energy-system.md](./energy-system.md). What differs is each one's *condition logic* — what has to be
 true, each tick, for it to generate.
 
 ## Combustion Generator
@@ -79,5 +79,5 @@ from the block itself), wire `WindTurbineBlockEntity` through `SkyColumnCheck` a
 ## Config-driven rates
 
 Every generator's capacity, generation rate, and max output are `SsmConfig` values (see
-[docs/dev/configuration.md](docs/dev/configuration.md)) rather than hardcoded — the block entities read
+[configuration.md](./configuration.md)) rather than hardcoded — the block entities read
 `SsmConfig.*.get()` fresh each tick, so config changes take effect without needing a block entity reload.
