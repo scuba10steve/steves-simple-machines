@@ -40,6 +40,7 @@ public class ModBlocks {
             new GeneratorBlock<>(
                     CombustionGeneratorBlockEntity::new,
                     CombustionGeneratorBlockEntity::tick,
+                    be -> be.fuelHandler,
                     BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
 
     public static final Supplier<GeneratorBlock<SolarPanelBlockEntity>> SOLAR_PANEL = BLOCKS.register("solar_panel", () ->
