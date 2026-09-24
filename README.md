@@ -20,7 +20,7 @@ capability, so it interoperates with any other FE-based mod. Includes JEI integr
 | **Crusher**                | Machine    | Raw ore (iron, gold, copper)              | 2x crushed ore                    | FE-powered; crushed ore smelts into ingots                     |
 | **Smelter**                | Machine    | Any vanilla smelting input (ore, crushed ore, food, etc.) | Vanilla smelting result | Reuses vanilla `minecraft:smelting` recipes, powered by FE instead of fuel |
 | **Sawmill**                | Machine    | Logs                                       | Planks + Sawdust                  | Two output slots; FE-powered                                    |
-| **Combustion Generator**   | Generator  | Coal, Charcoal, Coal Block                | FE                                 | Burns fuel; pauses (doesn't waste fuel) when its buffer is full |
+| **Combustion Generator**   | Generator  | Any vanilla or modded furnace fuel (coal, charcoal, sticks, etc.) | FE                                 | Burns fuel; pauses (doesn't waste fuel) when its buffer is full |
 | **Solar Panel**            | Generator  | Daylight + clear sky above                | FE                                 | Generates only during the day with direct sky access             |
 | **Water Wheel**            | Generator  | Adjacent water                            | FE                                 | Generates whenever any of the 6 neighbors is water                |
 | **Wind Turbine**           | Generator  | Clear sky above                           | FE                                 | Generates whenever the block can see the sky                     |
