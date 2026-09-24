@@ -31,6 +31,6 @@ public class CombustionBurnState {
             return new TickResult(remainingBurnTime, 0); // paused: buffer full, don't consume burn time
         }
         remainingBurnTime--;
-        return new TickResult(remainingBurnTime, generationRate);
+        return new TickResult(remainingBurnTime, Math.min(generationRate, bufferRoom));
     }
 }

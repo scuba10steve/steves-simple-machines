@@ -21,4 +21,16 @@ class CombustionBurnStateTest {
         assertEquals(1599, resumed.remainingBurnTime());
         assertEquals(160, resumed.energyToGenerate());
     }
+
+    @Test
+    void burnClampsEnergyToGenerateWhenBufferRoomIsLessThanGenerationRate() {
+        CombustionBurnState state = new CombustionBurnState();
+        state.startBurning(1600);
+
+        // Buffer has some room, but less than one tick's generation rate: must not report
+        // generating more than the buffer can actually hold, even though burn time still ticks down.
+        CombustionBurnState.TickResult partial = state.tick(/* generationRate */ 160, /* bufferRoom */ 50);
+        assertEquals(1599, partial.remainingBurnTime(), "burn time still consumed for a partial-room tick");
+        assertEquals(50, partial.energyToGenerate(), "energyToGenerate must be clamped to the available buffer room");
+    }
 }
