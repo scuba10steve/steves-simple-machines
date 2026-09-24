@@ -17,6 +17,13 @@ public class SimpleEnergyStorage extends EnergyStorage {
         return accepted;
     }
 
+    /** Drains internally consumed energy directly from the buffer, bypassing maxExtract. Returns the amount actually consumed. */
+    public int consume(int amount) {
+        int consumed = Math.min(amount, energy);
+        energy -= consumed;
+        return consumed;
+    }
+
     public void setEnergy(int amount) {
         this.energy = Mth.clamp(amount, 0, capacity);
     }

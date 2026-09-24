@@ -89,7 +89,7 @@ public class ProcessingMachineBlockEntity extends BlockEntity implements MenuPro
         boolean hasEnergy = be.energyStorage.getEnergyStored() >= perTick;
         ProcessingMachineState.TickOutcome outcome = be.state.tick(level, hasEnergy);
         if (outcome.energyConsumed()) {
-            be.energyStorage.extractEnergy(perTick, false);
+            be.energyStorage.consume(perTick);
         }
         be.setChanged();
     }

@@ -31,6 +31,23 @@ public class CrusherGameTest {
     }
 
     @GameTest(template = "empty", timeoutTicks = 200)
+    public static void crusherActuallyDrainsItsEnergyBuffer(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.CRUSHER.get());
+        ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
+        be.inventory.setStackInSlot(0, new ItemStack(Items.RAW_IRON));
+        int initialEnergy = 1000;
+        be.energyStorage.receiveEnergy(initialEnergy, false);
+
+        helper.runAfterDelay(120, () -> {
+            int remaining = be.energyStorage.getEnergyStored();
+            helper.assertTrue(remaining < initialEnergy,
+                    "expected energy buffer to actually decrease from processing, was still " + remaining);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 200)
     public static void crusherDoesNotProgressWithoutEnergy(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.CRUSHER.get());
