@@ -1,0 +1,11 @@
+{
+  "values": [
+    "ssm:crusher",
+    "ssm:sawmill",
+    "ssm:smelter",
+    "ssm:combustion_generator",
+    "ssm:solar_panel",
+    "ssm:water_wheel",
+    "ssm:wind_turbine"
+  ]
+}
