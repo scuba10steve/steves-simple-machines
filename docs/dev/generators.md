@@ -9,8 +9,12 @@ true, each tick, for it to generate.
 
 ## Combustion Generator
 
-Burns solid fuel (coal, charcoal, coal blocks — the same hardcoded `getBurnTime` table as vanilla furnaces, not the
-`FuelValues`/tag-driven vanilla fuel system) to generate FE at a fixed rate per burn-tick.
+Burns fuel to generate FE at a fixed rate per burn-tick. `getBurnTime(ItemStack)` delegates to NeoForge's
+`ItemStack#getBurnTime(RecipeType)` extension method (passing `null`, the same as vanilla's own
+`AbstractFurnaceBlockEntity.isFuel`), which resolves against the real furnace fuel registry — the `neoforge:furnace_fuels`
+data map plus the `FurnaceFuelBurnTimeEvent` hook — rather than a hardcoded item list. Any vanilla or modded fuel item
+(coal, charcoal, coal blocks, sticks, planks, blaze rods, lava buckets, etc.) works as fuel, not just a fixed set of 3
+hardcoded items.
 
 Condition logic, in `CombustionGeneratorBlockEntity.tick`:
 

@@ -14,9 +14,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -84,10 +82,7 @@ public class CombustionGeneratorBlockEntity extends BlockEntity implements MenuP
 
     public static int getBurnTime(ItemStack stack) {
         if (stack.isEmpty()) return 0;
-        Item item = stack.getItem();
-        if (item == Items.COAL || item == Items.CHARCOAL) return 1600;
-        if (item == Items.COAL_BLOCK) return 16000;
-        return 0;
+        return stack.getBurnTime(null);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, CombustionGeneratorBlockEntity be) {

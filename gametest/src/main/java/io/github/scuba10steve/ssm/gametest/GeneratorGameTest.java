@@ -50,6 +50,22 @@ public class GeneratorGameTest {
     }
 
     @GameTest(template = "empty")
+    public static void combustionGeneratorAcceptsNonHardcodedVanillaFuel(GameTestHelper helper) {
+        // Regression test for getBurnTime(ItemStack) delegating to the real furnace fuel
+        // registry (ItemStack#getBurnTime(RecipeType)) instead of a hardcoded 3-item table.
+        // Items.STICK was never one of the 3 hardcoded items (coal/charcoal/coal block) but
+        // has a real vanilla furnace fuel value, so this only passes with the real lookup.
+        helper.setBlock(POS, ModBlocks.COMBUSTION_GENERATOR.get());
+        CombustionGeneratorBlockEntity be = (CombustionGeneratorBlockEntity) helper.getBlockEntity(POS);
+        be.fuelHandler.setStackInSlot(0, new ItemStack(Items.STICK));
+
+        helper.runAfterDelay(10, () -> {
+            helper.assertTrue(be.energyStorage.getEnergyStored() > 0, "expected energy stored with stick in fuel slot");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
     public static void combustionGeneratorProducesNoEnergyWithoutFuel(GameTestHelper helper) {
         helper.setBlock(POS, ModBlocks.COMBUSTION_GENERATOR.get());
         CombustionGeneratorBlockEntity be = (CombustionGeneratorBlockEntity) helper.getBlockEntity(POS);
