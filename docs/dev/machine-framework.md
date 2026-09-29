@@ -7,19 +7,8 @@ a `MachineConfig` value, not a subclass.
 ## `MachineConfig`
 
 `io.github.scuba10steve.ssm.machine.MachineConfig` is a record describing everything a machine needs that varies
-per-machine:
-
-```java
-public record MachineConfig(
-        String id,
-        MachineRecipeLookup recipeLookup,
-        int outputSlotCount,
-        IntSupplier energyCapacity,
-        IntSupplier energyPerTick,
-        IntSupplier baseProcessTicks,
-        Supplier<MenuType<ProcessingMachineMenu>> menuType
-) {}
-```
+per-machine: `id`, `recipeLookup`, `outputSlotCount`, `energyCapacity`/`energyPerTick`/`baseProcessTicks`, and
+`menuType`.
 
 - `id` — used for the translation key (`block.ssm.<id>`) and matches the machine's registry name.
 - `recipeLookup` — how this machine finds a recipe for its current input (see below).
@@ -33,15 +22,8 @@ The three concrete instances live in `MachineConfigs` (`CRUSHER`, `SMELTER`, `SA
 
 ## `MachineRecipeLookup` and `MachineRecipeResult`
 
-```java
-public interface MachineRecipeLookup {
-    Optional<MachineRecipeResult> find(Level level, ItemStack input);
-}
-
-public record MachineRecipeResult(List<ItemStack> outputs, int processTicks) {}
-```
-
-This is the seam between "generic processing machine" and "how this specific machine decides what to make." A
+`MachineRecipeLookup` is a single-method interface — `find(Level, ItemStack) -> Optional<MachineRecipeResult>` —
+and `MachineRecipeResult` a record pairing a `List<ItemStack> outputs` with a `processTicks` count. This is the seam between "generic processing machine" and "how this specific machine decides what to make." A
 lookup is free to:
 
 - Query a custom `ssm` recipe type, as the Crusher and Sawmill do (`ModRecipes.CRUSHING_TYPE` /

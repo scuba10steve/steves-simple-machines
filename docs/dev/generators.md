@@ -33,20 +33,9 @@ Condition logic, in `CombustionGeneratorBlockEntity.tick`:
 
 This block entity is ported from `steves-advanced-storage`'s `CoalGeneratorBlockEntity`
 (`neoforge/src/main/java/io/github/scuba10steve/s3/advanced/blockentity/CoalGeneratorBlockEntity.java`), but with one
-deliberate behavioral change, isolated in `CombustionBurnState.tick(generationRate, bufferRoom)`:
-
-```java
-public TickResult tick(int generationRate, int bufferRoom) {
-    if (remainingBurnTime <= 0) {
-        return new TickResult(remainingBurnTime, 0);
-    }
-    if (bufferRoom <= 0) {
-        return new TickResult(remainingBurnTime, 0); // paused: buffer full, don't consume burn time
-    }
-    remainingBurnTime--;
-    return new TickResult(remainingBurnTime, generationRate);
-}
-```
+deliberate behavioral change, isolated in `CombustionBurnState.tick(int generationRate, int bufferRoom)`: when
+`bufferRoom <= 0`, it returns immediately without decrementing `remainingBurnTime`, pausing the burn instead of
+letting it continue for nothing.
 
 - **`steves-advanced-storage`'s source behavior:** burn time counts down every tick regardless of whether the energy
   buffer has room, so a full buffer means the fuel item is silently wasted while it finishes burning with nothing to

@@ -6,25 +6,9 @@ Just Enough Items (JEI) integration lives entirely under
 ## Two custom categories, one catalyst-only reuse
 
 `SsmJeiPlugin` registers two brand-new recipe categories — `ssm:crushing` and `ssm:sawing` — because those recipe
-types don't correspond to anything vanilla JEI already knows how to display:
-
-```java
-@Override
-public void registerCategories(IRecipeCategoryRegistration registration) {
-    registration.addRecipeCategories(
-            new CrushingCategory(registration.getJeiHelpers().getGuiHelper()),
-            new SawingCategory(registration.getJeiHelpers().getGuiHelper()));
-}
-
-@Override
-public void registerRecipes(IRecipeRegistration registration) {
-    RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-    registration.addRecipes(CrushingCategory.TYPE, recipeManager.getAllRecipesFor(ModRecipes.CRUSHING_TYPE.get())
-            .stream().map(RecipeHolder::value).toList());
-    registration.addRecipes(SawingCategory.TYPE, recipeManager.getAllRecipesFor(ModRecipes.SAWING_TYPE.get())
-            .stream().map(RecipeHolder::value).toList());
-}
-```
+types don't correspond to anything vanilla JEI already knows how to display. `registerCategories` adds a
+`CrushingCategory` and `SawingCategory` instance; `registerRecipes` pulls every recipe of `ModRecipes.CRUSHING_TYPE`/
+`SAWING_TYPE` from the live `RecipeManager` and hands them to the matching category.
 
 Each category (`CrushingCategory`, `SawingCategory`) is a small `IRecipeCategory<T>` implementation: a 120x40 GUI
 with an input slot and one (`CrushingCategory`) or two (`SawingCategory`, for planks + sawdust) output slots, an icon
@@ -35,17 +19,9 @@ drawn from the machine's own `ItemStack`, and a translatable title (`jei.ssm.cru
 [machine-framework.md](./machine-framework.md)), duplicating that as a third `ssm` category would
 show every smeltable item twice in JEI for no benefit. Instead, the Smelter is registered purely as a **catalyst** —
 "this block is a valid place to use this vanilla category's recipes" — without touching `registerCategories` or
-`registerRecipes` for smelting at all:
-
-```java
-@Override
-public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-    registration.addRecipeCatalyst(new ItemStack(ModBlocks.CRUSHER.get()), CrushingCategory.TYPE);
-    registration.addRecipeCatalyst(new ItemStack(ModBlocks.SAWMILL.get()), SawingCategory.TYPE);
-    // Smelter reuses vanilla's own Smelting category rather than a new ssm category:
-    registration.addRecipeCatalyst(new ItemStack(ModBlocks.SMELTER.get()), RecipeTypes.SMELTING);
-}
-```
+`registerRecipes` for smelting at all. `registerRecipeCatalysts` registers the Crusher and Sawmill against their own
+new categories, and the Smelter against vanilla's `RecipeTypes.SMELTING`, each as an `ItemStack` catalyst for the
+matching category.
 
 The practical effect: hovering a smelting recipe in JEI shows both the vanilla Furnace **and** the Smelter as valid
 places to make it, with zero duplicate recipe entries. The Crusher and Sawmill are also registered as catalysts for
@@ -60,21 +36,9 @@ a genuinely new recipe shape that no existing JEI category can render.
 
 JEI is a **client-only, optional** dependency: the mod must compile and run correctly (client and dedicated server)
 whether or not JEI is installed alongside it. This is enforced entirely through dependency scoping, not runtime
-`ModList.get().isLoaded(...)` checks:
-
-```groovy
-// buildSrc/src/main/groovy/ssm.neoforge-mod.gradle (applied by neoforge/ and gametest/, not core/)
-dependencies {
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.27.0.340"
-    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.27.0.340"
-    ...
-}
-
-// neoforge/build.gradle
-dependencies {
-    runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.27.0.340"
-}
-```
+`ModList.get().isLoaded(...)` checks: `buildSrc/src/main/groovy/ssm.neoforge-mod.gradle` (applied by `neoforge/` and
+`gametest/`, not `core/`) declares the two JEI API jars `compileOnly`; `neoforge/build.gradle` separately declares
+the full JEI mod jar `runtimeOnly`.
 
 - **`compileOnly`** on the JEI API jars: `SsmJeiPlugin` and the two categories can reference JEI's interfaces
   (`IModPlugin`, `IRecipeCategory`, etc.) at compile time, but those jars are **not** bundled into the built mod jar

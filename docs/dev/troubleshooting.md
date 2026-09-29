@@ -38,13 +38,8 @@ source sets to the `ssm` mod), never re-assign `version`. `core/build.gradle` is
 
 ### `runGameTestServer` reports 0 tests, or the wrong tests
 
-Gametests are gated by `neoforge.enabledGameTestNamespaces`, set in `gametest/build.gradle`:
-
-```gradle
-systemProperty 'neoforge.enabledGameTestNamespaces', 'ssm'
-```
-
-If a new `@GameTest`-annotated class lives in a different namespace, or the structure template's resource location
+Gametests are gated by the `neoforge.enabledGameTestNamespaces` system property, set to `'ssm'` on the
+`gameTestServer` run in `gametest/build.gradle`. If a new `@GameTest`-annotated class lives in a different namespace, or the structure template's resource location
 uses a different namespace than `ssm`, the test silently won't run. Check the console log line
 `Enabled Gametest Namespaces: [ssm]` at startup.
 
@@ -52,16 +47,8 @@ uses a different namespace than `ssm`, the test silently won't run. Check the co
 
 `gametest/` is a separate Gradle project with its own `sourceSets.main`, which contains only test code — no blocks,
 items, or recipes of its own. `core`'s and `neoforge`'s actual content only become visible to the gametest server
-because `gametest/build.gradle` explicitly adds both source sets:
-
-```gradle
-mods {
-    ssm {
-        modSourceSets.add(providers.provider { project(':core').sourceSets.main })
-        modSourceSets.add(providers.provider { project(':neoforge').sourceSets.main })
-    }
-}
-```
+because `gametest/build.gradle` explicitly adds both source sets via two `modSourceSets.add(providers.provider {
+... })` calls, one for `:core` and one for `:neoforge`.
 
 Blocks, items, and recipe registration (`ModBlocks`, etc.) live in `neoforge`, not `core` — if the `:neoforge` line is
 ever removed, or `neoforge`'s source set changes shape, gametests will fail to find blocks registered there. Removing
@@ -75,19 +62,13 @@ the `:core` line would similarly break anything gametests exercise that depends 
 `core` has **no `unitTest` harness at all** — it's a `neoFormVersion`-only module (vanilla MC classes, no NeoForge
 APIs), so there's no `neoForge.unitTest { enable() }` block to boot anything for it. Any `core` test that touches a
 vanilla static that reaches `BuiltInRegistries` (e.g. `Items`, `ItemStack`, `Fluids`) must bootstrap the registries
-itself, once, before the first such touch:
-
-```java
-@BeforeAll
-static void bootstrapRegistries() {
-    SharedConstants.tryDetectVersion();
-    Bootstrap.bootStrap();
-}
-```
+itself, once, before the first such touch — a `@BeforeAll` calling `SharedConstants.tryDetectVersion()` then
+`Bootstrap.bootStrap()`.
 
 `Bootstrap.bootStrap()` is idempotent (a no-op after the first successful call), so it's safe to declare this in
-every `core` test class that needs it rather than relying on another test class happening to run first — see
-`AdjacentWaterCheckTest`, `ProcessingMachineStateTest`, and `SmeltingLookupTest` for the exact working pattern. If a
+every `core` test class that needs it rather than relying on another test class happening to run first — see the
+exact working pattern (and don't copy it out of this doc, which can drift; read the actual method) in
+`AdjacentWaterCheckTest`, `ProcessingMachineStateTest`, `SmeltingLookupTest`, and `WindExposureCheckTest`. If a
 test omits this and something else in the same JVM touches `BuiltInRegistries` first without bootstrapping, the
 class permanently fails to initialize for the rest of that test run (`ExceptionInInitializerError` the first time,
 `NoClassDefFoundError` on every subsequent touch) — this is a JVM class-loading behavior, not something a later
@@ -100,18 +81,9 @@ class permanently fails to initialize for the rest of that test run (`ExceptionI
 
 Bootstrapping (above) registers built-in objects (`Fluids.WATER`, etc.) but does **not** run the datapack/resource
 reload that normally populates tag membership on world load. A test exercising production code that checks
-`SomeState.is(SomeTag)` will see an empty tag unless the test binds it manually first, the way
-`AdjacentWaterCheckTest` does:
-
-```java
-@BeforeAll
-static void bindWaterTagForTest() {
-    SharedConstants.tryDetectVersion();
-    Bootstrap.bootStrap();
-    BuiltInRegistries.FLUID.bindTags(Map.of(
-            FluidTags.WATER, List.of(Fluids.WATER.builtInRegistryHolder(), Fluids.FLOWING_WATER.builtInRegistryHolder())));
-}
-```
+`SomeState.is(SomeTag)` will see an empty tag unless the test binds it manually first, via the registry's own public
+`bindTags` API — see `AdjacentWaterCheckTest`'s `@BeforeAll` for the exact working pattern (don't copy it here;
+read the actual method, since a doc copy can drift out of sync with the real test).
 
 Prefer this over weakening production code to check fluid/item identity instead of tag membership — the tag check
 is the behaviorally correct one (it also matches modded water-like fluids), it's just not automatically populated

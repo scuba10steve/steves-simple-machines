@@ -55,59 +55,16 @@ steves-simple-machines/
 
 ### `buildSrc/src/main/groovy/ssm.conventions.gradle`
 
-The base convention plugin, applied (directly or transitively) by all three projects — deliberately bare, with no
-NeoForge dependency at all, so `core/build.gradle` can layer a `neoFormVersion`-only `neoForge {}` block on top of it
-without conflict:
-
-```gradle
-plugins {
-    id 'java'
-    id 'ssm.repositories'
-}
-
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-}
-```
+The base convention plugin, applied (directly or transitively) by all three projects — deliberately bare (`java` +
+`ssm.repositories` + `tasks.withType(Test).configureEach { useJUnitPlatform() }`), with no NeoForge dependency at
+all, so `core/build.gradle` can layer a `neoFormVersion`-only `neoForge {}` block on top of it without conflict.
 
 ### `buildSrc/src/main/groovy/ssm.neoforge-mod.gradle`
 
-The NeoForge-specific convention plugin, applied by `neoforge/` and `gametest/` (not `core/`):
-
-```gradle
-plugins {
-    id 'java'
-    id 'net.neoforged.moddev'
-    id 'ssm.conventions'
-}
-
-version = rootProject.mod_version
-group = 'io.github.scuba10steve'
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-neoForge {
-    version = neoforge_version
-
-    runs {
-        client { client() }
-        server { server() }
-    }
-}
-
-dependencies {
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.27.0.340"
-    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.27.0.340"
-    implementation project(':core')
-
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-test {
-    useJUnitPlatform()
-}
-```
+The NeoForge-specific convention plugin, applied by `neoforge/` and `gametest/` (not `core/`). Applies
+`net.neoforged.moddev` + `ssm.conventions`, sets `version`/`group`, pins the Java 21 toolchain, sets
+`neoForge.version = neoforge_version` with `client`/`server` runs, declares the JEI API jars `compileOnly` plus
+`implementation project(':core')`, and JUnit `testImplementation`/`testRuntimeOnly`.
 
 Both `neoforge/build.gradle` and `gametest/build.gradle` apply this and then add their own `mods { ssm { ... } }`
 block on top — each project enables modding (`neoForge.version = ...`) exactly once, satisfied here, so their own
@@ -116,200 +73,57 @@ enable modding in the same project twice" guard; see [troubleshooting.md](./trou
 
 ### `core/build.gradle`
 
-```gradle
-plugins {
-    id 'net.neoforged.moddev'
-    id 'ssm.conventions'
-}
-
-version = rootProject.mod_version
-group = 'io.github.scuba10steve'
-
-base {
-    archivesName = 'ssm-core'
-}
-
-neoForge {
-    // neoFormVersion gives us vanilla MC classes only — no NeoForge APIs
-    neoFormVersion = "${minecraft_version}-20240808.144430"
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-configurations.testCompileClasspath.extendsFrom(configurations.compileClasspath)
-configurations.testRuntimeClasspath.extendsFrom(configurations.runtimeClasspath)
-
-test {
-    useJUnitPlatform()
-}
-
-configurations {
-    coreOutput {
-        canBeConsumed = true
-        canBeResolved = false
-    }
-}
-artifacts {
-    coreOutput(compileJava.destinationDirectory) { builtBy compileJava }
-    coreOutput(sourceSets.main.output.resourcesDir) { builtBy processResources }
-}
-```
-
-`core` applies `net.neoforged.moddev` directly (not through `ssm.neoforge-mod`) with only `neoFormVersion` set, which
-gives vanilla `net.minecraft` classes without any NeoForge API — that's what keeps `core` platform-agnostic. Because
-ModDevGradle only wires that vanilla classpath onto the `main` source set's `compileClasspath`, the
-`testCompileClasspath`/`testRuntimeClasspath` `extendsFrom` calls are needed so tests (`AdjacentWaterCheckTest`,
-`SmeltingLookupTest`, etc.) can see `net.minecraft` classes too. The `coreOutput` configuration is a Gradle
-[variant-aware dependency](https://docs.gradle.org/current/userguide/cross_project_publications.html) that exposes
-`core`'s compiled classes and resources for `neoforge` (and, transitively, `gametest`) to consume without publishing
-an actual artifact.
+Applies `net.neoforged.moddev` directly (not through `ssm.neoforge-mod`) with only `neoFormVersion` set — that's
+what keeps `core` platform-agnostic: it gives vanilla `net.minecraft` classes without any NeoForge API. Sets
+`base.archivesName = 'ssm-core'`. Because ModDevGradle only wires that vanilla classpath onto the `main` source
+set's `compileClasspath`, `core/build.gradle` also has `configurations.testCompileClasspath.extendsFrom(...)` /
+`testRuntimeClasspath.extendsFrom(...)` lines so tests (`AdjacentWaterCheckTest`, `SmeltingLookupTest`, etc.) can
+see `net.minecraft` classes too. It exposes a `coreOutput` configuration (`canBeConsumed = true`, backed by
+`compileJava.destinationDirectory` and the processed resources dir) — a Gradle
+[variant-aware dependency](https://docs.gradle.org/current/userguide/cross_project_publications.html) that lets
+`neoforge` (and, transitively, `gametest`) consume `core`'s compiled classes and resources without publishing an
+actual artifact.
 
 ### `neoforge/build.gradle`
 
-```gradle
-plugins {
-    id 'ssm.neoforge-mod'
-}
-
-base {
-    archivesName = 'ssm'
-}
-
-neoForge {
-    mods {
-        ssm {
-            sourceSet sourceSets.main
-            modSourceSets.add(providers.provider { project(':core').sourceSets.main })
-        }
-    }
-
-    unitTest {
-        enable()
-        testedMod = mods.ssm
-    }
-}
-
-configurations {
-    coreClasses {
-        canBeConsumed = false
-        canBeResolved = true
-    }
-}
-
-jar {
-    from configurations.coreClasses
-}
-
-processResources {
-    def replaceProperties = [
-        mod_version: mod_version,
-        loader_version_range: loader_version_range,
-        neoforge_version_range: neoforge_version_range,
-        minecraft_version_range: minecraft_version_range
-    ]
-    inputs.properties replaceProperties
-    filesMatching('META-INF/neoforge.mods.toml') {
-        expand(replaceProperties)
-    }
-}
-
-dependencies {
-    runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.27.0.340"
-    coreClasses project(path: ':core', configuration: 'coreOutput')
-}
-```
-
-The `coreClasses` resolvable configuration consumes `core`'s `coreOutput` and `jar { from configurations.coreClasses }`
-folds `core`'s compiled classes/resources directly into the `neoforge` jar, so the built mod is a single self-contained
-jar even though the source lives in two Gradle modules. `unitTest.enable()` is ModDevGradle's support for running
-plain JUnit tests against a mod-loaded classpath (needed because `CrushingRecipeTest`/`SawingRecipeTest` touch
-Minecraft classes like `ItemStack`); it's declared here, after `mods.ssm` exists, rather than in `ssm.neoforge-mod`,
-since `mods.ssm` isn't declared until each applying project's own `build.gradle` runs. The `runtimeOnly` JEI
-dependency lives only here, not in the shared convention plugin — see [jei-integration.md](./jei-integration.md) for
-why `gametest/` deliberately doesn't get it.
+Applies `ssm.neoforge-mod`, sets `base.archivesName = 'ssm'`. Declares a `coreClasses` resolvable configuration
+consuming `core`'s `coreOutput`, and `jar { from configurations.coreClasses }` folds `core`'s compiled
+classes/resources directly into the `neoforge` jar — so the built mod is a single self-contained jar even though
+the source lives in two Gradle modules. Also declares `neoForge { mods { ssm { ... } } }` (adding `core`'s main
+source set via `modSourceSets`) and, inside that same block, `unitTest { enable(); testedMod = mods.ssm }` —
+ModDevGradle's support for running plain JUnit tests against a mod-loaded classpath (needed because
+`CrushingRecipeTest`/`SawingRecipeTest` touch Minecraft classes like `ItemStack`). This has to live here, after
+`mods.ssm` exists, rather than in `ssm.neoforge-mod`, since `mods.ssm` isn't declared until each applying project's
+own `build.gradle` runs. `processResources` expands `${mod_version}`/`${loader_version_range}`/
+`${neoforge_version_range}`/`${minecraft_version_range}`/`${jei_version_range}` tokens into
+`META-INF/neoforge.mods.toml`. The `runtimeOnly` JEI dependency lives only here, not in the shared convention
+plugin — see [jei-integration.md](./jei-integration.md) for why `gametest/` deliberately doesn't get it.
 
 ### `gametest/build.gradle`
 
-```gradle
-plugins {
-    id 'ssm.neoforge-mod'
-}
-
-evaluationDependsOn(':core')
-evaluationDependsOn(':neoforge')
-
-neoForge {
-    runs {
-        gameTestServer {
-            type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', 'ssm'
-        }
-    }
-
-    mods {
-        ssm {
-            sourceSet sourceSets.main
-            modSourceSets.add(providers.provider { project(':core').sourceSets.main })
-            modSourceSets.add(providers.provider { project(':neoforge').sourceSets.main })
-        }
-    }
-}
-
-dependencies {
-    implementation project(':core')
-    implementation project(':neoforge')
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.14.4"
-}
-```
-
-`ssm.neoforge-mod` already enables modding (with a version) for this project; this block only *adds to* that —
-re-setting `neoForge.version` here would trip the same "cannot enable modding in the same project twice" guard
-mentioned above. The two `modSourceSets.add(...)` calls are what make both `core`'s pure logic and `neoforge`'s actual
-game content (blocks, recipes, etc.) visible to the gametest server, since `gametest/`'s own source set contains only
-test code, no game content of its own.
+Applies `ssm.neoforge-mod`, plus `evaluationDependsOn(':core')` and `evaluationDependsOn(':neoforge')` — needed
+because IDE Gradle-sync resolves the `modSourceSets.add(providers.provider { ... })` lazy providers below eagerly,
+before those projects have configured, in a way `./gradlew build` does not (see
+[troubleshooting.md](./troubleshooting.md)). Adds its own `neoForge { runs { gameTestServer { ... } } }` and `mods {
+ssm { ... } }` block: `ssm.neoforge-mod` already enables modding (with a version) for this project, so this block
+only *adds to* that — re-setting `neoForge.version` here would trip the same "cannot enable modding in the same
+project twice" guard mentioned above. The two `modSourceSets.add(...)` calls (one for `:core`, one for `:neoforge`)
+are what make both `core`'s pure logic and `neoforge`'s actual game content (blocks, recipes, etc.) visible to the
+gametest server, since `gametest/`'s own source set contains only test code, no game content of its own. Also
+declares `implementation project(':core')` and `implementation project(':neoforge')`.
 
 ### `gradle.properties`
 
-```properties
-minecraft_version=1.21.1
-minecraft_version_range=[1.21.1,1.22)
-neoforge_version=21.1.226
-neoforge_version_range=[21.1,22)
-loader_version_range=[4,)
-
-mod_id=ssm
-mod_name=Steve's Simple Machines
-mod_license=MIT
-mod_version=0.1.0
-mod_authors=scuba10steve, zerofall, SBlectric
-mod_description=Better power generation and automated ore/wood processing for Minecraft.
-```
+Holds every version and range token referenced above: `minecraft_version`/`minecraft_version_range`,
+`neoforge_version`/`neoforge_version_range`, `loader_version_range`, `jei_version`/`jei_version_range`, and the
+`mod_id`/`mod_name`/`mod_license`/`mod_version`/`mod_authors`/`mod_description` values `processResources` expands
+into `neoforge.mods.toml`.
 
 ### `settings.gradle`
 
-```gradle
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        maven { name = 'NeoForged'; url = 'https://maven.neoforged.net/releases' }
-    }
-    plugins {
-        id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
-    }
-}
-
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention'
-}
-
-rootProject.name = 'steves-simple-machines'
-include 'core'
-include 'neoforge'
-include 'gametest'
-```
+`rootProject.name = 'steves-simple-machines'` plus `include 'core'`, `include 'neoforge'`, `include 'gametest'`,
+and the standard `pluginManagement` block (Gradle Plugin Portal + the NeoForged Maven repo, for
+`org.gradle.toolchains.foojay-resolver-convention`).
 
 ## Gradle Tasks
 

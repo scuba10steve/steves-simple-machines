@@ -5,15 +5,8 @@ transfer. There is a single storage implementation shared by every machine and g
 
 ## `SimpleEnergyStorage`
 
-```java
-public class SimpleEnergyStorage extends EnergyStorage {
-    public SimpleEnergyStorage(int capacity, int maxReceive, int maxExtract) { super(capacity, maxReceive, maxExtract); }
-    public int generate(int amount) { ... }   // bypasses maxReceive
-    public void setEnergy(int amount) { ... } // clamped setter, used on NBT load
-}
-```
-
-It's a thin extension of NeoForge's own `EnergyStorage`, adding two things vanilla `EnergyStorage` doesn't give you:
+It's a thin extension of NeoForge's own `EnergyStorage` (constructor takes `capacity, maxReceive, maxExtract`,
+same as the parent class), adding two things vanilla `EnergyStorage` doesn't give you:
 
 - **`generate(int amount)`** — adds energy directly to the buffer, clamped to remaining capacity, and returns the
   amount actually accepted. This is how generators fill their own buffer. It deliberately bypasses `maxReceive`
@@ -33,14 +26,8 @@ Every machine and generator constructs its own `SimpleEnergyStorage`:
 ## Capability registration (`ModCapabilities`)
 
 Every energy-capable `BlockEntityType` is registered against NeoForge's `Capabilities.EnergyStorage.BLOCK` in
-`ModCapabilities#registerCapabilities`, listening on `RegisterCapabilitiesEvent`:
-
-```java
-event.registerBlockEntity(
-        Capabilities.EnergyStorage.BLOCK,
-        ModBlockEntities.CRUSHER.get(),
-        (be, side) -> be.energyStorage);
-```
+`ModCapabilities#registerCapabilities`, listening on `RegisterCapabilitiesEvent`, via
+`event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, <BlockEntityType>, (be, side) -> be.energyStorage)`.
 
 This is repeated once per energy-capable block entity (Crusher, Sawmill, Smelter, Combustion Generator, Solar Panel,
 Water Wheel, Wind Turbine) — each registration is a one-liner mapping a `BlockEntityType` to a `(blockEntity, side)
@@ -60,26 +47,9 @@ out, on their own tick, rather than waiting to be pulled from. This loop, along 
 NBT round-trip, and the lo/hi `ContainerData` bit-packing, lives once in the shared abstract base
 `GeneratorBlockEntity` (`neoforge/src/main/java/io/github/scuba10steve/ssm/generator/GeneratorBlockEntity.java`) that
 `CombustionGeneratorBlockEntity`, `SolarPanelBlockEntity`, `WaterWheelBlockEntity`, and `WindTurbineBlockEntity` all
-extend. Each `tick(...)` static method ends by calling the inherited helper:
-
-```java
-protected final void pushEnergyToNeighbors(Level level, BlockPos pos, int maxOutput) {
-    if (energyStorage.getEnergyStored() <= 0) {
-        return;
-    }
-    for (Direction dir : Direction.values()) {
-        IEnergyStorage neighbour = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos.relative(dir), dir.getOpposite());
-        if (neighbour != null && neighbour.canReceive()) {
-            int toSend = Math.min(energyStorage.getEnergyStored(), maxOutput);
-            int sent = neighbour.receiveEnergy(toSend, false);
-            if (sent > 0) {
-                energyStorage.extractEnergy(sent, false);
-                setChanged();
-            }
-        }
-    }
-}
-```
+extend. Each `tick(...)` static method ends by calling the inherited `pushEnergyToNeighbors(Level, BlockPos,
+maxOutput)` helper, which does nothing if the buffer is empty, otherwise loops all 6 directions looking up each
+neighbor's `Capabilities.EnergyStorage.BLOCK` capability and pushing into any that can receive.
 
 Notes on this pattern:
 

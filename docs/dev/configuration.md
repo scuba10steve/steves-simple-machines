@@ -2,11 +2,7 @@
 
 Steve's Simple Machines uses NeoForge's `ModConfigSpec` system to generate a TOML configuration file, written to
 **`config/ssm-common.toml`** the first time the mod loads. It is registered as a **common** config
-(`ModConfig.Type.COMMON`) — see `Ssm`'s constructor:
-
-```java
-modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
-```
+(`ModConfig.Type.COMMON`) via `modContainer.registerConfig(...)` in `Ssm`'s constructor.
 
 ## Configuration File Structure
 
@@ -72,19 +68,13 @@ output (generators).
 
 ### Config Registration
 
-```java
-// Ssm.java
-modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
-```
+Registered in `Ssm.java`'s constructor: `modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC,
+"ssm-common.toml")`.
 
 There is no platform-abstraction layer here (unlike `steves-simple-storage`'s `S3Config` interface) — `SsmConfig`
 (`neoforge/src/main/java/io/github/scuba10steve/ssm/config/SsmConfig.java`) lives entirely in the `neoforge` module
 alongside the block entities that use it, so they read its static fields directly without going through any
-`core`-side abstraction:
-
-```java
-int energyPerTick = SsmConfig.CRUSHER_ENERGY_PER_TICK.get();
-```
+`core`-side abstraction (e.g. `SsmConfig.CRUSHER_ENERGY_PER_TICK.get()`).
 
 ### Adding a config value for a new machine/generator
 
