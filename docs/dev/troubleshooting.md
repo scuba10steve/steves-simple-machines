@@ -70,16 +70,44 @@ the `:core` line would similarly break anything gametests exercise that depends 
 
 ## Unit Test Issues
 
+### A `core` test touching vanilla statics throws `NoClassDefFoundError` / "Not bootstrapped"
+
+`core` has **no `unitTest` harness at all** — it's a `neoFormVersion`-only module (vanilla MC classes, no NeoForge
+APIs), so there's no `neoForge.unitTest { enable() }` block to boot anything for it. Any `core` test that touches a
+vanilla static that reaches `BuiltInRegistries` (e.g. `Items`, `ItemStack`, `Fluids`) must bootstrap the registries
+itself, once, before the first such touch:
+
+```java
+@BeforeAll
+static void bootstrapRegistries() {
+    SharedConstants.tryDetectVersion();
+    Bootstrap.bootStrap();
+}
+```
+
+`Bootstrap.bootStrap()` is idempotent (a no-op after the first successful call), so it's safe to declare this in
+every `core` test class that needs it rather than relying on another test class happening to run first — see
+`AdjacentWaterCheckTest`, `ProcessingMachineStateTest`, and `SmeltingLookupTest` for the exact working pattern. If a
+test omits this and something else in the same JVM touches `BuiltInRegistries` first without bootstrapping, the
+class permanently fails to initialize for the rest of that test run (`ExceptionInInitializerError` the first time,
+`NoClassDefFoundError` on every subsequent touch) — this is a JVM class-loading behavior, not something a later
+`Bootstrap.bootStrap()` call can undo.
+
+`neoforge` tests get this for free instead: `neoforge/build.gradle` declares `neoForge.unitTest { enable(); testedMod
+= mods.ssm }`, which boots the registries for the whole `:neoforge` test source set automatically.
+
 ### A registry tag (e.g. `FluidTags.WATER`) is empty in a unit test
 
-`neoForge.unitTest` boots far enough to statically register built-in objects (`Fluids.WATER`, etc.) but does **not**
-run the datapack/resource reload that normally populates tag membership on world load. A test exercising
-production code that checks `SomeState.is(SomeTag)` will see an empty tag unless the test binds it manually first,
-the way `AdjacentWaterCheckTest` does:
+Bootstrapping (above) registers built-in objects (`Fluids.WATER`, etc.) but does **not** run the datapack/resource
+reload that normally populates tag membership on world load. A test exercising production code that checks
+`SomeState.is(SomeTag)` will see an empty tag unless the test binds it manually first, the way
+`AdjacentWaterCheckTest` does:
 
 ```java
 @BeforeAll
 static void bindWaterTagForTest() {
+    SharedConstants.tryDetectVersion();
+    Bootstrap.bootStrap();
     BuiltInRegistries.FLUID.bindTags(Map.of(
             FluidTags.WATER, List.of(Fluids.WATER.builtInRegistryHolder(), Fluids.FLOWING_WATER.builtInRegistryHolder())));
 }

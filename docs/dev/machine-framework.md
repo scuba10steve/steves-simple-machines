@@ -77,10 +77,17 @@ drives it directly).
 inventory, so e.g. the Sawmill's two outputs (planks + sawdust) are only inserted if **both** fit together — a
 partial insert that then discards the other output is never possible.
 
+`ProcessingMachineState` lives in `core` and depends only on the small `MachineInventory` interface (3 methods:
+`getStackInSlot`, `extractItem`, `insertItem`) rather than NeoForge's `ItemStackHandler` directly — this is what lets
+the state machine (and its test) live in the platform-agnostic module. `neoforge`'s `ItemStackHandlerInventory` is
+the adapter that wraps a real `ItemStackHandler` to implement `MachineInventory`; `ProcessingMachineBlockEntity`
+constructs one and passes it to `ProcessingMachineState`'s constructor (see below).
+
 ## `ProcessingMachineBlockEntity`
 
 A thin wrapper: owns the `ItemStackHandler` inventory (`1 + outputSlotCount` slots — slot 0 is input), the
-`SimpleEnergyStorage`, and delegates all state-machine logic to `ProcessingMachineState`. `tick(...)` (called by
+`SimpleEnergyStorage`, wraps `inventory` in an `ItemStackHandlerInventory` when constructing `ProcessingMachineState`,
+and delegates all state-machine logic to it. `tick(...)` (called by
 `ProcessingMachineBlock#getTicker`) checks whether `energyPerTick` is available, calls
 `state.tick(level, hasEnergy)`, and only then extracts the energy — the `TickOutcome.energyConsumed()` flag is what
 actually gates the `extractEnergy` call, not a second energy check.

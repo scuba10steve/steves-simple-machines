@@ -14,13 +14,13 @@ neoForge {
         }
     }
 
-    // Several of this module's unit tests (ProcessingMachineStateTest, CrushingRecipeTest,
-    // SawingRecipeTest) touch vanilla static registries (Items, etc.) that require the game to
-    // be bootstrapped. 'ssm.neoforge-mod' has no unitTest block of its own, since mods.ssm isn't
-    // declared until each applying project's own build.gradle (this one) runs; it's enabled here
-    // instead, after 'mods.ssm' is declared above, matching the pre-split single-module build's
-    // ordering. This enables it for the whole :neoforge test source set, not only the 3 tests
-    // named above (SimpleEnergyStorageTest doesn't need it, but sharing the setting is harmless).
+    // Some of this module's unit tests (CrushingRecipeTest, SawingRecipeTest) touch vanilla
+    // static registries (Items, etc.) that require the game to be bootstrapped. 'ssm.neoforge-mod'
+    // has no unitTest block of its own, since mods.ssm isn't declared until each applying
+    // project's own build.gradle (this one) runs; it's enabled here instead, after 'mods.ssm' is
+    // declared above, matching the pre-split single-module build's ordering. This enables it for
+    // the whole :neoforge test source set, not only the 2 tests named above (SimpleEnergyStorageTest
+    // doesn't need it, but sharing the setting is harmless).
     unitTest {
         enable()
         testedMod = mods.ssm

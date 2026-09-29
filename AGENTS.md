@@ -44,8 +44,8 @@ steves-simple-machines/
     src/main/java/io/github/scuba10steve/ssm/
       ref/RefStrings.java          MODID constant ("ssm")
       machine/                     MachineRecipeLookup, MachineRecipeResult, SsmMachineRecipe, SmelterAdapter,
-                                    MachineInventory (inventory abstraction), ProcessingMachineState (implements
-                                    MachineInventory instead of depending on NeoForge's ItemStackHandler)
+                                    MachineInventory (inventory abstraction), ProcessingMachineState (depends on
+                                    MachineInventory instead of NeoForge's ItemStackHandler directly)
       generator/                   CombustionBurnState, AdjacentWaterCheck, SkyColumnCheck
     src/test/java/io/github/scuba10steve/ssm/   16 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
                                     CombustionBurnStateTest, AdjacentWaterCheckTest, SkyColumnCheckTest,

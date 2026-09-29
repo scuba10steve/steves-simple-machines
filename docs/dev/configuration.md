@@ -75,8 +75,10 @@ output (generators).
 modContainer.registerConfig(ModConfig.Type.COMMON, SsmConfig.SPEC, "ssm-common.toml");
 ```
 
-There is no platform-abstraction layer here (unlike `steves-simple-storage`'s `S3Config` interface) — this is a
-single-module project, so block entities read `SsmConfig`'s static fields directly:
+There is no platform-abstraction layer here (unlike `steves-simple-storage`'s `S3Config` interface) — `SsmConfig`
+(`neoforge/src/main/java/io/github/scuba10steve/ssm/config/SsmConfig.java`) lives entirely in the `neoforge` module
+alongside the block entities that use it, so they read its static fields directly without going through any
+`core`-side abstraction:
 
 ```java
 int energyPerTick = SsmConfig.CRUSHER_ENERGY_PER_TICK.get();

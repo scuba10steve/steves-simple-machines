@@ -58,7 +58,7 @@ exposed to hoppers/cables/other mods without this registration.
 Machines are pure sinks — something else must push FE into them. All 4 generators push their own generated energy
 out, on their own tick, rather than waiting to be pulled from. This loop, along with the FE buffer itself, the
 NBT round-trip, and the lo/hi `ContainerData` bit-packing, lives once in the shared abstract base
-`GeneratorBlockEntity` (`src/main/java/io/github/scuba10steve/ssm/generator/GeneratorBlockEntity.java`) that
+`GeneratorBlockEntity` (`neoforge/src/main/java/io/github/scuba10steve/ssm/generator/GeneratorBlockEntity.java`) that
 `CombustionGeneratorBlockEntity`, `SolarPanelBlockEntity`, `WaterWheelBlockEntity`, and `WindTurbineBlockEntity` all
 extend. Each `tick(...)` static method ends by calling the inherited helper:
 

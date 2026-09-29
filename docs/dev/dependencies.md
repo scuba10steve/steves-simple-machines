@@ -24,8 +24,8 @@ Last checked: 2026-09-23
 
 | Dependency                    | Current Version | Notes                                     |
 |--------------------------------|-----------------|---------------------------------------------|
-| **JUnit Jupiter**              | 5.14.4          | `testImplementation`, via `ssm.conventions` |
-| **JUnit Platform Launcher**    | 1.14.4 (`gametest`) / transitive (root) | Runtime only |
+| **JUnit Jupiter**              | 5.14.4          | `testImplementation`, declared per-module in `core/build.gradle` and `buildSrc/src/main/groovy/ssm.neoforge-mod.gradle` (`ssm.conventions.gradle` itself only sets up `useJUnitPlatform()`) |
+| **JUnit Platform Launcher**    | 1.14.4 (`gametest`, pinned) / transitive (`core`; `neoforge` via `ssm.neoforge-mod`) | Runtime only |
 
 ## Version Compatibility
 
@@ -72,9 +72,10 @@ curl -s "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metad
 1. **Commit all changes first** — updates should be their own commit.
 2. **Review changelogs** for breaking changes, especially for NeoForge/ModDevGradle.
 3. **Rebuild and test:** `./gradlew build :gametest:runGameTestServer` after bumping any version in
-   `gradle.properties`, `buildSrc/build.gradle`, `buildSrc/src/main/groovy/ssm.conventions.gradle`, or the root
-   `build.gradle`'s JEI `runtimeOnly` line — JEI's version string is currently duplicated across those two Gradle
-   files rather than centralized in `gradle.properties`, so keep both in sync manually.
+   `gradle.properties`, `buildSrc/build.gradle`, `buildSrc/src/main/groovy/ssm.neoforge-mod.gradle` (JEI's
+   `compileOnly` API deps), or `neoforge/build.gradle` (JEI's `runtimeOnly` mod jar) — JEI's version string is
+   currently duplicated across those two Gradle files rather than centralized in `gradle.properties`, so keep both
+   in sync manually.
 
 ## Update History
 

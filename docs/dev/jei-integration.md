@@ -1,7 +1,7 @@
 # JEI Integration
 
 Just Enough Items (JEI) integration lives entirely under
-`src/main/java/io/github/scuba10steve/ssm/compat/jei/`: `SsmJeiPlugin`, `CrushingCategory`, `SawingCategory`.
+`neoforge/src/main/java/io/github/scuba10steve/ssm/compat/jei/`: `SsmJeiPlugin`, `CrushingCategory`, `SawingCategory`.
 
 ## Two custom categories, one catalyst-only reuse
 
@@ -63,14 +63,14 @@ whether or not JEI is installed alongside it. This is enforced entirely through 
 `ModList.get().isLoaded(...)` checks:
 
 ```groovy
-// buildSrc/src/main/groovy/ssm.conventions.gradle
+// buildSrc/src/main/groovy/ssm.neoforge-mod.gradle (applied by neoforge/ and gametest/, not core/)
 dependencies {
     compileOnly "mezz.jei:jei-1.21.1-common-api:19.27.0.340"
     compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.27.0.340"
     ...
 }
 
-// build.gradle (root)
+// neoforge/build.gradle
 dependencies {
     runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.27.0.340"
 }
@@ -80,13 +80,16 @@ dependencies {
   (`IModPlugin`, `IRecipeCategory`, etc.) at compile time, but those jars are **not** bundled into the built mod jar
   and are **not** required at runtime just to load `ssm`. This is what makes JEI truly optional — a server or client
   without JEI installed still loads `ssm` fine; `SsmJeiPlugin` (annotated `@JeiPlugin`) simply never gets instantiated
-  because JEI itself isn't present to discover it.
-- **`runtimeOnly`** on the full JEI mod jar (only in the root `build.gradle`, not in the shared `ssm.conventions`
-  plugin used by `gametest/`): this makes JEI present in the dev environment (`runClient`, and anywhere the root
-  project's runtime classpath is used) so the integration can actually be exercised during development, without
-  making JEI a compile-time or `neoforge.mods.toml` dependency of the shipped mod. It is deliberately **not** added
-  to `gametest/`'s dependencies — the gametest suite exercises machine/generator gameplay via
-  `NeoForge.EVENT_BUS`/`GameTestHelper`, not JEI's own GUI, so it doesn't need JEI on its classpath at all.
+  because JEI itself isn't present to discover it. Since `ssm.neoforge-mod` is shared by both `neoforge/` and
+  `gametest/`, `gametest/` also gets the JEI API on its compile classpath, though it has no JEI-referencing code of
+  its own.
+- **`runtimeOnly`** on the full JEI mod jar, declared only in `neoforge/build.gradle` (not in the shared
+  `ssm.neoforge-mod` convention plugin, and not in `gametest/build.gradle`): this makes JEI present in the dev
+  environment (`runClient`, and anywhere `neoforge`'s runtime classpath is used) so the integration can actually be
+  exercised during development, without making JEI a compile-time or `neoforge.mods.toml` dependency of the shipped
+  mod. It is deliberately **not** added to `gametest/`'s dependencies — the gametest suite exercises machine/generator
+  gameplay via `NeoForge.EVENT_BUS`/`GameTestHelper`, not JEI's own GUI, so it doesn't need JEI on its classpath at
+  runtime.
 
 If you add JEI API usage anywhere outside `compat/jei/`, keep it behind the same `compileOnly` boundary — anything
 that unconditionally imports a JEI class at runtime (outside a class JEI itself instantiates via `@JeiPlugin`) would
