@@ -1,5 +1,6 @@
 package io.github.scuba10steve.ssm.machine;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 class FakeMachineInventory implements MachineInventory {
@@ -47,10 +48,21 @@ class FakeMachineInventory implements MachineInventory {
         }
         ItemStack existing = slots[slot];
         if (existing.isEmpty()) {
+            // Matches real ItemStackHandler: an empty slot has no per-slot limit of its own, so the
+            // cap is min(ABSOLUTE_MAX_STACK_SIZE, stack.getMaxStackSize()), not the whole incoming stack.
+            int limit = Math.min(Item.ABSOLUTE_MAX_STACK_SIZE, stack.getMaxStackSize());
+            int toInsert = Math.min(limit, stack.getCount());
             if (!simulate) {
-                slots[slot] = stack.copy();
+                ItemStack inserted = stack.copy();
+                inserted.setCount(toInsert);
+                slots[slot] = inserted;
             }
-            return ItemStack.EMPTY;
+            if (toInsert == stack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+            ItemStack remainder = stack.copy();
+            remainder.shrink(toInsert);
+            return remainder;
         }
         if (!ItemStack.isSameItemSameComponents(existing, stack)) {
             return stack;
