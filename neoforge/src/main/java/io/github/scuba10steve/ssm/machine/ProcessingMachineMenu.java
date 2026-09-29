@@ -79,6 +79,10 @@ public class ProcessingMachineMenu extends AbstractContainerMenu {
         return (containerData.get(5) << 16) | (containerData.get(4) & 0xFFFF);
     }
 
+    public int getOutputSlotCount() {
+        return outputSlotCount;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         ItemStack result = ItemStack.EMPTY;

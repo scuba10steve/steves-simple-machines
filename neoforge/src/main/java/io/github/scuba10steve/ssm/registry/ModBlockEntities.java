@@ -1,7 +1,7 @@
 package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
-import io.github.scuba10steve.ssm.generator.SolarPanelBlockEntity;
+import io.github.scuba10steve.ssm.generator.SolarGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.WaterWheelBlockEntity;
 import io.github.scuba10steve.ssm.generator.WindTurbineBlockEntity;
 import io.github.scuba10steve.ssm.machine.MachineConfigs;
@@ -41,10 +41,10 @@ public class ModBlockEntities {
                     BlockEntityType.Builder.of(CombustionGeneratorBlockEntity::new,
                             ModBlocks.COMBUSTION_GENERATOR.get()).build(null));
 
-    public static final Supplier<BlockEntityType<SolarPanelBlockEntity>> SOLAR_PANEL =
-            BLOCK_ENTITIES.register("solar_panel", () ->
-                    BlockEntityType.Builder.of(SolarPanelBlockEntity::new,
-                            ModBlocks.SOLAR_PANEL.get()).build(null));
+    public static final Supplier<BlockEntityType<SolarGeneratorBlockEntity>> SOLAR_GENERATOR =
+            BLOCK_ENTITIES.register("solar_generator", () ->
+                    BlockEntityType.Builder.of(SolarGeneratorBlockEntity::new,
+                            ModBlocks.SOLAR_GENERATOR.get()).build(null));
 
     public static final Supplier<BlockEntityType<WaterWheelBlockEntity>> WATER_WHEEL =
             BLOCK_ENTITIES.register("water_wheel", () ->

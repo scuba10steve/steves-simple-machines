@@ -29,7 +29,7 @@ Every energy-capable `BlockEntityType` is registered against NeoForge's `Capabil
 `ModCapabilities#registerCapabilities`, listening on `RegisterCapabilitiesEvent`, via
 `event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, <BlockEntityType>, (be, side) -> be.energyStorage)`.
 
-This is repeated once per energy-capable block entity (Crusher, Sawmill, Smelter, Combustion Generator, Solar Panel,
+This is repeated once per energy-capable block entity (Crusher, Sawmill, Smelter, Combustion Generator, Solar Generator,
 Water Wheel, Wind Turbine) — each registration is a one-liner mapping a `BlockEntityType` to a `(blockEntity, side)
 -> IEnergyStorage` accessor, always returning the block entity's own `energyStorage` field regardless of `side`
 (none of these blocks have side-specific energy behavior, e.g. an input-only face). The three processing machines
@@ -46,7 +46,7 @@ Machines are pure sinks — something else must push FE into them. All 4 generat
 out, on their own tick, rather than waiting to be pulled from. This loop, along with the FE buffer itself, the
 NBT round-trip, and the lo/hi `ContainerData` bit-packing, lives once in the shared abstract base
 `GeneratorBlockEntity` (`neoforge/src/main/java/io/github/scuba10steve/ssm/generator/GeneratorBlockEntity.java`) that
-`CombustionGeneratorBlockEntity`, `SolarPanelBlockEntity`, `WaterWheelBlockEntity`, and `WindTurbineBlockEntity` all
+`CombustionGeneratorBlockEntity`, `SolarGeneratorBlockEntity`, `WaterWheelBlockEntity`, and `WindTurbineBlockEntity` all
 extend. Each `tick(...)` static method ends by calling the inherited `pushEnergyToNeighbors(Level, BlockPos,
 maxOutput)` helper, which does nothing if the buffer is empty, otherwise loops all 6 directions looking up each
 neighbor's `Capabilities.EnergyStorage.BLOCK` capability and pushing into any that can receive.

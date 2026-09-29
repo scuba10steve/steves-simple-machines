@@ -1,7 +1,7 @@
 # Steve's Simple Machines (SSM)
 
 Better power generation and automated ore/wood processing for Minecraft. Steve's Simple Machines adds three
-FE-powered processing machines (Crusher, Sawmill, Smelter) and four generators (Combustion, Solar Panel, Water
+FE-powered processing machines (Crusher, Sawmill, Smelter) and four generators (Combustion, Solar, Water
 Wheel, Wind Turbine) — a small, focused automation layer that plugs into NeoForge's standard Forge Energy (FE)
 capability, so it interoperates with any other FE-based mod. Includes JEI integration for all machine recipes.
 
@@ -17,11 +17,11 @@ capability, so it interoperates with any other FE-based mod. Includes JEI integr
 
 | Block                    | Role       | Input                                   | Output                          | Notes                                                        |
 |---------------------------|------------|-------------------------------------------|-----------------------------------|-----------------------------------------------------------------|
-| **Crusher**                | Machine    | Raw ore (iron, gold, copper)              | 2x crushed ore                    | FE-powered; crushed ore smelts into ingots                     |
+| **Crusher**                | Machine    | Raw ore (iron, gold, copper)              | 2x crushed ore                    | Two output slots (second is overflow buffer); crushed ore smelts into ingots |
 | **Smelter**                | Machine    | Any vanilla smelting input (ore, crushed ore, food, etc.) | Vanilla smelting result | Reuses vanilla `minecraft:smelting` recipes, powered by FE instead of fuel |
 | **Sawmill**                | Machine    | Logs                                       | Planks + Sawdust                  | Two output slots; FE-powered                                    |
 | **Combustion Generator**   | Generator  | Any vanilla or modded furnace fuel (coal, charcoal, sticks, etc.) | FE                                 | Burns fuel; pauses (doesn't waste fuel) when its buffer is full |
-| **Solar Panel**            | Generator  | Daylight + clear sky above                | FE                                 | Generates only during the day with direct sky access             |
+| **Solar Generator**        | Generator  | Daylight + clear sky above                | FE                                 | Generates only during the day with direct sky access; crafted with 3 **Solar Panel** components |
 | **Water Wheel**            | Generator  | Adjacent water                            | FE                                 | Generates whenever any of the 6 neighbors is water                |
 | **Wind Turbine**           | Generator  | High altitude + open surroundings         | FE                                 | Generates above a configurable min height with most sides unobstructed |
 
@@ -142,8 +142,9 @@ Licensed under the MIT License (`mod_license` in `gradle.properties`).
 - **Author**: scuba10steve
 - **Game**: [Minecraft](http://www.minecraft.net/) by [Mojang AB](http://mojang.com/)
 - **Mod Loader**: [NeoForge](https://neoforged.net/)
-- Combustion Generator and Solar Panel are adapted from `steves-advanced-storage`'s generator block entities.
-- Block textures for **Smelter** (`device_smelter_bottom/front/side/top`) are sourced from [malcolmriley/unused-textures](https://github.com/malcolmriley/unused-textures) via a [personal fork](https://github.com/scuba10steve/unused-minecraft-textures), used under the [Creative Commons Attribution 4.0 International License (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/).
+- Combustion Generator and Solar Generator are adapted from `steves-advanced-storage`'s generator block entities;
+  the Solar Generator's block texture is also copied directly from that mod's Solar Generator.
+- Block textures for **Smelter** (`device_smelter_bottom/front/side/top`) and item textures for **Crushed Iron/Gold/Copper** (`material_chunks_iron/gold/copper`) and **Sawdust** (`material_dust_wood`) are sourced from [malcolmriley/unused-textures](https://github.com/malcolmriley/unused-textures) via a [personal fork](https://github.com/scuba10steve/unused-minecraft-textures), used under the [Creative Commons Attribution 4.0 International License (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/).
 - Block textures for **Crusher** (`block_breaker_side/top`) and **Sawmill** (`bronze_sawmill_bottom/front_off/side/top`) are sourced from [Futureazoo/TextureRepository](https://github.com/Futureazoo/TextureRepository), used under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Links

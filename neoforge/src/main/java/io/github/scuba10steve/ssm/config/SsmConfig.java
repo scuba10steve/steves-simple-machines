@@ -26,7 +26,7 @@ public class SsmConfig {
     public static final ModConfigSpec.IntValue COMBUSTION_GENERATION_RATE;
     public static final ModConfigSpec.IntValue COMBUSTION_MAX_OUTPUT;
 
-    // Solar Panel
+    // Solar Generator
     public static final ModConfigSpec.IntValue SOLAR_CAPACITY;
     public static final ModConfigSpec.IntValue SOLAR_GENERATION_RATE;
     public static final ModConfigSpec.IntValue SOLAR_MAX_OUTPUT;
@@ -70,7 +70,7 @@ public class SsmConfig {
         COMBUSTION_MAX_OUTPUT = builder.comment("Max FE pushed to a neighbor per tick").defineInRange("max_output", 200, 0, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.comment("Solar Panel").push("solar_panel");
+        builder.comment("Solar Generator").push("solar_generator");
         SOLAR_CAPACITY = builder.comment("FE buffer capacity").defineInRange("capacity", 20_000, 1, Integer.MAX_VALUE);
         SOLAR_GENERATION_RATE = builder.comment("FE generated per tick during daytime with sky access").defineInRange("generation_rate", 20, 0, Integer.MAX_VALUE);
         SOLAR_MAX_OUTPUT = builder.comment("Max FE pushed to a neighbor per tick").defineInRange("max_output", 100, 0, Integer.MAX_VALUE);

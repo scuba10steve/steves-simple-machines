@@ -16,7 +16,11 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public class CrusherGameTest {
 
     @GameTest(template = "empty", timeoutTicks = 200)
-    public static void crusherDoublesRawIronWithSufficientEnergy(GameTestHelper helper) {
+    public static void crusherFillsFirstOutputSlotBeforeOverflowingToSecond(GameTestHelper helper) {
+        // Crusher's 2 output slots are overflow buffer capacity, not a forced 1-and-1 split: both
+        // units of a completion's output land in the first slot that has room (merging normally,
+        // same as any stackable item), and the second slot only starts filling once the first
+        // reaches its max stack size. See ProcessingMachineState's slot-search order.
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.CRUSHER.get());
         ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
@@ -24,9 +28,11 @@ public class CrusherGameTest {
         be.energyStorage.receiveEnergy(100_000, false);
 
         helper.runAfterDelay(120, () -> {
-            ItemStack output = be.inventory.getStackInSlot(1);
-            helper.assertTrue(output.getItem().toString().contains("crushed_iron") && output.getCount() == 2,
-                    "expected 2x crushed_iron in output slot");
+            ItemStack slot1 = be.inventory.getStackInSlot(1);
+            ItemStack slot2 = be.inventory.getStackInSlot(2);
+            helper.assertTrue(slot1.getItem().toString().contains("crushed_iron") && slot1.getCount() == 2,
+                    "expected both units of crushed_iron in the first output slot");
+            helper.assertTrue(slot2.isEmpty(), "expected the second output slot to remain empty until the first is full");
             helper.succeed();
         });
     }
@@ -68,15 +74,19 @@ public class CrusherGameTest {
         helper.setBlock(pos, ModBlocks.CRUSHER.get());
         ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
         be.inventory.setStackInSlot(0, new ItemStack(Items.RAW_IRON));
-        // Output slot already full: no room for the 2 crushed_iron the recipe would produce.
+        // Both output slots already full: no room for either of the 2 separate crushed_iron
+        // stacks the recipe would produce. Filling only one slot would not block completion,
+        // since the recipe's 2 outputs would simply both land in the other, still-open slot.
         be.inventory.setStackInSlot(1, new ItemStack(ModItems.CRUSHED_IRON.get(), 64));
+        be.inventory.setStackInSlot(2, new ItemStack(ModItems.CRUSHED_IRON.get(), 64));
         be.energyStorage.receiveEnergy(100_000, false);
 
         helper.runAfterDelay(120, () -> {
             helper.assertTrue(!be.inventory.getStackInSlot(0).isEmpty(),
                     "input must not be consumed while output has no room");
-            helper.assertTrue(be.inventory.getStackInSlot(1).getCount() == 64,
-                    "output slot must remain exactly 64, nothing duplicated or lost");
+            helper.assertTrue(be.inventory.getStackInSlot(1).getCount() == 64
+                            && be.inventory.getStackInSlot(2).getCount() == 64,
+                    "both output slots must remain exactly 64, nothing duplicated or lost");
             helper.succeed();
         });
     }

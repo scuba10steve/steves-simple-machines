@@ -1,7 +1,7 @@
 package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorScreen;
-import io.github.scuba10steve.ssm.generator.SolarPanelScreen;
+import io.github.scuba10steve.ssm.generator.SolarGeneratorScreen;
 import io.github.scuba10steve.ssm.generator.WaterWheelScreen;
 import io.github.scuba10steve.ssm.generator.WindTurbineScreen;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineScreen;
@@ -24,7 +24,7 @@ public class ModClientSetup {
         event.register(ModMenuTypes.SAWMILL.get(), ProcessingMachineScreen::new);
         event.register(ModMenuTypes.SMELTER.get(), ProcessingMachineScreen::new);
         event.register(ModMenuTypes.COMBUSTION_GENERATOR.get(), CombustionGeneratorScreen::new);
-        event.register(ModMenuTypes.SOLAR_PANEL.get(), SolarPanelScreen::new);
+        event.register(ModMenuTypes.SOLAR_GENERATOR.get(), SolarGeneratorScreen::new);
         event.register(ModMenuTypes.WATER_WHEEL.get(), WaterWheelScreen::new);
         event.register(ModMenuTypes.WIND_TURBINE.get(), WindTurbineScreen::new);
     }

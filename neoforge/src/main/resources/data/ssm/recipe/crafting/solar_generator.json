@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "IRI",
+    "III"
+  ],
+  "key": {
+    "S": { "item": "ssm:solar_panel" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "id": "ssm:solar_generator", "count": 1 }
+}

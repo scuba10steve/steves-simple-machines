@@ -20,7 +20,7 @@ public class MachineConfigs {
                             holder.value().getProcessTicksOverride() >= 0
                                     ? holder.value().getProcessTicksOverride()
                                     : SsmConfig.CRUSHER_PROCESS_TICKS.get())),
-            1,
+            2,
             SsmConfig.CRUSHER_CAPACITY::get,
             SsmConfig.CRUSHER_ENERGY_PER_TICK::get,
             SsmConfig.CRUSHER_PROCESS_TICKS::get,

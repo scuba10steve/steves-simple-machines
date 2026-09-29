@@ -48,9 +48,13 @@ This is covered directly by `CombustionBurnStateTest#burnPausesWhenBufferIsFullA
 tick with `bufferRoom = 0` leaves `remainingBurnTime` unchanged before asserting a following tick with room resumes
 normally.
 
-## Solar Panel
+## Solar Generator
 
-Condition, in `SolarPanelBlockEntity.tick`: generates only when `level.isDay()` **and** there is sky light directly
+Not to be confused with the plain **Solar Panel** item (`ssm:solar_panel`) — a crafting-only component with no
+block/placement behavior of its own, used as an ingredient in the Solar Generator's crafting recipe. Only the
+Solar Generator block has the generation logic described below.
+
+Condition, in `SolarGeneratorBlockEntity.tick`: generates only when `level.isDay()` **and** there is sky light directly
 above the block (`level.getBrightness(LightLayer.SKY, pos.above()) > 0`) — a roof, or being underground, blocks
 generation even during the day. `getCurrentRate()` (exposed via `ContainerData` for the screen) reflects the actual
 rate only while both conditions hold; it's zeroed the instant either fails, including the edge case where
@@ -71,7 +75,7 @@ Condition, in `WindTurbineBlockEntity.tick`: generates whenever it is both high 
 min_height`) **and** sufficiently exposed (at least `min_free_neighbors` of its 6 adjacent positions are air).
 Both thresholds are `SsmConfig` values (`WIND_TURBINE_MIN_HEIGHT`, `WIND_TURBINE_MIN_FREE_NEIGHBORS`).
 
-Unlike Solar Panel (which genuinely needs direct sunlight, and so correctly uses `level.canSeeSky`), Wind Turbine
+Unlike Solar Generator (which genuinely needs direct sunlight, and so correctly uses `level.canSeeSky`), Wind Turbine
 originally reused `level.canSeeSky(pos.above())` too — a weather/light-visibility check, not a wind-relevant one,
 since Minecraft has no actual wind simulation to check against. That was replaced with a height + open-neighbor
 check that's thematically closer to "elevated and not boxed in," implemented as `WindExposureCheck.isExposed(int y,

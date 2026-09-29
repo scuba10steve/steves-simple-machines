@@ -1,7 +1,7 @@
 package io.github.scuba10steve.ssm.registry;
 
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorMenu;
-import io.github.scuba10steve.ssm.generator.SolarPanelMenu;
+import io.github.scuba10steve.ssm.generator.SolarGeneratorMenu;
 import io.github.scuba10steve.ssm.generator.WaterWheelMenu;
 import io.github.scuba10steve.ssm.generator.WindTurbineMenu;
 import io.github.scuba10steve.ssm.machine.ProcessingMachineMenu;
@@ -33,9 +33,9 @@ public class ModMenuTypes {
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
                     (containerId, inv, buf) -> new CombustionGeneratorMenu(ModMenuTypes.COMBUSTION_GENERATOR.get(), containerId, inv, buf)));
 
-    public static final Supplier<MenuType<SolarPanelMenu>> SOLAR_PANEL = MENU_TYPES.register("solar_panel", () ->
+    public static final Supplier<MenuType<SolarGeneratorMenu>> SOLAR_GENERATOR = MENU_TYPES.register("solar_generator", () ->
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
-                    (containerId, inv, buf) -> new SolarPanelMenu(ModMenuTypes.SOLAR_PANEL.get(), containerId, inv, buf)));
+                    (containerId, inv, buf) -> new SolarGeneratorMenu(ModMenuTypes.SOLAR_GENERATOR.get(), containerId, inv, buf)));
 
     public static final Supplier<MenuType<WaterWheelMenu>> WATER_WHEEL = MENU_TYPES.register("water_wheel", () ->
             net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(

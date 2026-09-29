@@ -106,7 +106,7 @@ the operation on its next tick.
 
 ### A generator seems to "waste" fuel/sunlight/wind when its buffer is full
 
-For the Solar Panel, Water Wheel, and Wind Turbine, this can't happen — `SimpleEnergyStorage.generate(...)` simply
+For the Solar Generator, Water Wheel, and Wind Turbine, this can't happen — `SimpleEnergyStorage.generate(...)` simply
 clamps to remaining capacity and returns 0 if there's no room; the underlying condition (daylight, adjacent water,
 clear sky) isn't "consumed" by a tick that generates nothing.
 

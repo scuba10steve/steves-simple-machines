@@ -37,7 +37,7 @@ output (generators).
     generation_rate = 160      # FE generated per burn-tick
     max_output = 200           # Max FE pushed to a neighbor per tick
 
-[solar_panel]
+[solar_generator]
     capacity = 20000
     generation_rate = 20       # FE generated per tick during daytime with sky access
     max_output = 100

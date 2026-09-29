@@ -12,7 +12,11 @@ per-machine: `id`, `recipeLookup`, `outputSlotCount`, `energyCapacity`/`energyPe
 
 - `id` — used for the translation key (`block.ssm.<id>`) and matches the machine's registry name.
 - `recipeLookup` — how this machine finds a recipe for its current input (see below).
-- `outputSlotCount` — 1 for Crusher/Smelter, 2 for Sawmill (planks + sawdust).
+- `outputSlotCount` — 1 for Smelter, 2 for Crusher and Sawmill. Crusher's second slot is overflow
+  buffer capacity, not a forced split: `CrushingRecipe` still produces one combined stack (e.g. 2x
+  crushed ore), which lands entirely in the first output slot with room; the second slot only
+  starts filling once the first reaches max stack size (see `ProcessingMachineState#insertAll`).
+  Sawmill's two slots hold genuinely distinct items (planks, sawdust) instead.
 - `energyCapacity` / `energyPerTick` / `baseProcessTicks` — `IntSupplier`s rather than plain `int`s so they read
   live `SsmConfig` values (config changes don't require re-registering the block).
 - `menuType` — the machine's own registered `MenuType`, needed by `ProcessingMachineBlockEntity#createMenu`.

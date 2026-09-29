@@ -2,7 +2,7 @@ package io.github.scuba10steve.ssm.gametest;
 
 import io.github.scuba10steve.ssm.config.SsmConfig;
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
-import io.github.scuba10steve.ssm.generator.SolarPanelBlockEntity;
+import io.github.scuba10steve.ssm.generator.SolarGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.WaterWheelBlockEntity;
 import io.github.scuba10steve.ssm.generator.WindTurbineBlockEntity;
 import io.github.scuba10steve.ssm.registry.ModBlocks;
@@ -92,12 +92,12 @@ public class GeneratorGameTest {
         });
     }
 
-    // --- Solar Panel ---
+    // --- Solar Generator ---
 
     @GameTest(template = "empty")
-    public static void solarPanelProducesEnergyWithSkyAccessAtDay(GameTestHelper helper) {
-        helper.setBlock(POS, ModBlocks.SOLAR_PANEL.get());
-        SolarPanelBlockEntity be = (SolarPanelBlockEntity) helper.getBlockEntity(POS);
+    public static void solarGeneratorProducesEnergyWithSkyAccessAtDay(GameTestHelper helper) {
+        helper.setBlock(POS, ModBlocks.SOLAR_GENERATOR.get());
+        SolarGeneratorBlockEntity be = (SolarGeneratorBlockEntity) helper.getBlockEntity(POS);
         helper.setDayTime(6000);
 
         helper.runAfterDelay(20, () -> {
@@ -107,9 +107,9 @@ public class GeneratorGameTest {
     }
 
     @GameTest(template = "empty")
-    public static void solarPanelProducesNoEnergyWhenCovered(GameTestHelper helper) {
-        helper.setBlock(POS, ModBlocks.SOLAR_PANEL.get());
-        SolarPanelBlockEntity be = (SolarPanelBlockEntity) helper.getBlockEntity(POS);
+    public static void solarGeneratorProducesNoEnergyWhenCovered(GameTestHelper helper) {
+        helper.setBlock(POS, ModBlocks.SOLAR_GENERATOR.get());
+        SolarGeneratorBlockEntity be = (SolarGeneratorBlockEntity) helper.getBlockEntity(POS);
         helper.setDayTime(6000);
         enclose(helper, POS.above());
 

@@ -15,13 +15,20 @@ public class CombustionGeneratorScreen extends AbstractContainerScreen<Combustio
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "textures/gui/container/processing_machine.png");
 
+    // Actual PNG dimensions — see ProcessingMachineScreen for why the 9-arg GuiGraphics#blit
+    // overload (which takes these explicitly) is required instead of the 7-arg convenience
+    // overload, which hardcodes 256x256 and silently corrupts the sampled region on any other size.
+    private static final int TEXTURE_WIDTH = 200;
+    private static final int TEXTURE_HEIGHT = 166;
+
     private static final int FLAME_U = 176;
     private static final int FLAME_V = 0;
     private static final int FLAME_W = 14;
     private static final int FLAME_H = 13;
 
+    private static final int ENERGY_BAR_BG_U = 182;
     private static final int ENERGY_BAR_U = 176;
-    private static final int ENERGY_BAR_V = 14;
+    private static final int ENERGY_BAR_V = 16;
     private static final int ENERGY_BAR_W = 6;
     private static final int ENERGY_BAR_H = 50;
 
@@ -40,18 +47,24 @@ public class CombustionGeneratorScreen extends AbstractContainerScreen<Combustio
     protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
-        graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+        graphics.blit(TEXTURE, x, y, 0, 0f, 0f, imageWidth, imageHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
         if (menu.isLit()) {
             int progress = menu.getBurnProgress();
-            graphics.blit(TEXTURE, x + FLAME_X, y + FLAME_Y + (FLAME_H - progress),
-                    FLAME_U, FLAME_V + (FLAME_H - progress), FLAME_W, progress);
+            graphics.blit(TEXTURE, x + FLAME_X, y + FLAME_Y + (FLAME_H - progress), 0,
+                    (float) FLAME_U, (float) (FLAME_V + (FLAME_H - progress)),
+                    FLAME_W, progress, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         }
+
+        // Background drawn full-height every time so the bar is visible even at 0 energy.
+        graphics.blit(TEXTURE, x + ENERGY_BAR_X, y + ENERGY_BAR_Y, 0, (float) ENERGY_BAR_BG_U, (float) ENERGY_BAR_V,
+                ENERGY_BAR_W, ENERGY_BAR_H, TEXTURE_WIDTH, TEXTURE_HEIGHT);
 
         int capacity = menu.getEnergyCapacity();
         int filledHeight = capacity > 0 ? ENERGY_BAR_H * menu.getEnergyStored() / capacity : 0;
-        graphics.blit(TEXTURE, x + ENERGY_BAR_X, y + ENERGY_BAR_Y + (ENERGY_BAR_H - filledHeight),
-                ENERGY_BAR_U, ENERGY_BAR_V + (ENERGY_BAR_H - filledHeight), ENERGY_BAR_W, filledHeight);
+        graphics.blit(TEXTURE, x + ENERGY_BAR_X, y + ENERGY_BAR_Y + (ENERGY_BAR_H - filledHeight), 0,
+                (float) ENERGY_BAR_U, (float) (ENERGY_BAR_V + (ENERGY_BAR_H - filledHeight)),
+                ENERGY_BAR_W, filledHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     }
 
     @Override

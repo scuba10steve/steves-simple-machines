@@ -43,7 +43,7 @@ public class ModCapabilities {
                 (be, side) -> be.fuelHandler);
         event.registerBlockEntity(
                 net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
-                ModBlockEntities.SOLAR_PANEL.get(),
+                ModBlockEntities.SOLAR_GENERATOR.get(),
                 (be, side) -> be.energyStorage);
         event.registerBlockEntity(
                 net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,

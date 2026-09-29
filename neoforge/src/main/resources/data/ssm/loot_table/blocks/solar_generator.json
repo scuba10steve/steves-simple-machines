@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ssm:solar_panel"
+          "name": "ssm:solar_generator"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "ssm:blocks/solar_panel"
+  "random_sequence": "ssm:blocks/solar_generator"
 }

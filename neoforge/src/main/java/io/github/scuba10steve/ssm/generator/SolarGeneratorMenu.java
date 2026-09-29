@@ -7,23 +7,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
-public class SolarPanelMenu extends AbstractContainerMenu {
+public class SolarGeneratorMenu extends AbstractContainerMenu {
 
-    private final SolarPanelBlockEntity blockEntity;
+    private final SolarGeneratorBlockEntity blockEntity;
     private final ContainerData containerData;
 
     // Client constructor
-    public SolarPanelMenu(MenuType<?> type, int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
+    public SolarGeneratorMenu(MenuType<?> type, int containerId, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
         this(type, containerId, playerInventory, getBlockEntity(playerInventory, buf.readBlockPos()), new SimpleContainerData(5));
     }
 
     // Server constructor
-    public SolarPanelMenu(MenuType<?> type, int containerId, Inventory playerInventory, SolarPanelBlockEntity blockEntity) {
+    public SolarGeneratorMenu(MenuType<?> type, int containerId, Inventory playerInventory, SolarGeneratorBlockEntity blockEntity) {
         this(type, containerId, playerInventory, blockEntity, blockEntity.containerData);
     }
 
-    private SolarPanelMenu(MenuType<?> type, int containerId, Inventory playerInventory,
-                            SolarPanelBlockEntity blockEntity, ContainerData containerData) {
+    private SolarGeneratorMenu(MenuType<?> type, int containerId, Inventory playerInventory,
+                            SolarGeneratorBlockEntity blockEntity, ContainerData containerData) {
         super(type, containerId);
         this.blockEntity = blockEntity;
         this.containerData = containerData;
@@ -40,11 +40,11 @@ public class SolarPanelMenu extends AbstractContainerMenu {
         addDataSlots(containerData);
     }
 
-    private static SolarPanelBlockEntity getBlockEntity(Inventory inventory, BlockPos pos) {
-        if (inventory.player.level().getBlockEntity(pos) instanceof SolarPanelBlockEntity be) {
+    private static SolarGeneratorBlockEntity getBlockEntity(Inventory inventory, BlockPos pos) {
+        if (inventory.player.level().getBlockEntity(pos) instanceof SolarGeneratorBlockEntity be) {
             return be;
         }
-        throw new IllegalStateException("No SolarPanelBlockEntity at " + pos);
+        throw new IllegalStateException("No SolarGeneratorBlockEntity at " + pos);
     }
 
     public int getEnergyStored() {

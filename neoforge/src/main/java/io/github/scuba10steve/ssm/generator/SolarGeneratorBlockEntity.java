@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SolarPanelBlockEntity extends GeneratorBlockEntity {
+public class SolarGeneratorBlockEntity extends GeneratorBlockEntity {
 
     private int currentRate;
 
@@ -45,21 +45,21 @@ public class SolarPanelBlockEntity extends GeneratorBlockEntity {
         return currentRate;
     }
 
-    public SolarPanelBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.SOLAR_PANEL.get(), pos, state, SsmConfig.SOLAR_CAPACITY.get(), SsmConfig.SOLAR_MAX_OUTPUT.get());
+    public SolarGeneratorBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.SOLAR_GENERATOR.get(), pos, state, SsmConfig.SOLAR_CAPACITY.get(), SsmConfig.SOLAR_MAX_OUTPUT.get());
     }
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.ssm.solar_panel");
+        return Component.translatable("block.ssm.solar_generator");
     }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory playerInventory, Player player) {
-        return new SolarPanelMenu(ModMenuTypes.SOLAR_PANEL.get(), id, playerInventory, this);
+        return new SolarGeneratorMenu(ModMenuTypes.SOLAR_GENERATOR.get(), id, playerInventory, this);
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, SolarPanelBlockEntity be) {
+    public static void tick(Level level, BlockPos pos, BlockState state, SolarGeneratorBlockEntity be) {
         if (level.isClientSide()) return;
 
         int skyLight = level.getBrightness(LightLayer.SKY, pos.above());
