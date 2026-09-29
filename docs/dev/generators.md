@@ -86,12 +86,16 @@ Unlike Solar Panel (which genuinely needs direct sunlight, and so correctly uses
 originally reused `level.canSeeSky(pos.above())` too — a weather/light-visibility check, not a wind-relevant one,
 since Minecraft has no actual wind simulation to check against. That was replaced with a height + open-neighbor
 check that's thematically closer to "elevated and not boxed in," implemented as `WindExposureCheck.isExposed(int y,
-int minHeight, List<Boolean> isNeighborAir, int minFreeNeighbors)` — a pure, unit-tested class (`WindExposureCheckTest`)
-following the same pattern as `AdjacentWaterCheck`: the impure part (fetching each neighbor's block state, which
-needs a live `Level`) stays in `WindTurbineBlockEntity#tick`, and the pure predicate logic is extracted for
-testability. This superseded the earlier `SkyColumnCheck` class (which, notably, was never actually wired into any
-block entity — it was dead code from the start, extracted in anticipation of a multi-block-tall clearance check that
-never got built); `SkyColumnCheck`/`SkyColumnCheckTest` were removed rather than left alongside the new class.
+int minHeight, List<BlockState> neighborStates, int minFreeNeighbors)` — a pure, unit-tested class
+(`WindExposureCheckTest`) following the same pattern as `AdjacentWaterCheck`: the impure part (fetching each
+neighbor's raw `BlockState`, which needs a live `Level`) stays in `WindTurbineBlockEntity#tick`, but the actual
+predicate (`BlockState::isAir`) lives inside `WindExposureCheck` itself, not the caller — mirroring
+`AdjacentWaterCheck` taking raw `FluidState`s and doing its own tag check, rather than the caller pre-computing a
+`List<Boolean>` and handing over only the aggregate result (an earlier draft of this class did exactly that, and
+was corrected once the parallel with `SkyColumnCheck`'s original flaw was pointed out). This superseded the earlier
+`SkyColumnCheck` class (which, notably, was never actually wired into any block entity — it was dead code from the
+start, extracted in anticipation of a multi-block-tall clearance check that never got built); `SkyColumnCheck`/
+`SkyColumnCheckTest` were removed rather than left alongside the new class.
 
 Like the Water Wheel, `isGenerating()` reflects `exposed && generateAndMarkChanged(rate)`, so a full buffer
 correctly reports not-generating even when high enough and exposed

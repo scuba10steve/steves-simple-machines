@@ -68,7 +68,7 @@ public class WindTurbineBlockEntity extends GeneratorBlockEntity {
                 pos.getY(),
                 SsmConfig.WIND_TURBINE_MIN_HEIGHT.get(),
                 Arrays.stream(Direction.values())
-                        .map(dir -> level.getBlockState(pos.relative(dir)).isAir())
+                        .map(dir -> level.getBlockState(pos.relative(dir)))
                         .toList(),
                 SsmConfig.WIND_TURBINE_MIN_FREE_NEIGHBORS.get());
 
