@@ -37,10 +37,22 @@ class AdjacentWaterCheckTest {
     }
 
     @Test
-    void trueWhenAnyNeighborIsWaterSourceOrFlowing() {
+    void trueWhenAnyNeighborIsWaterSource() {
         assertTrue(AdjacentWaterCheck.hasAdjacentWater(List.of(
                 Fluids.EMPTY.defaultFluidState(),
                 Fluids.WATER.defaultFluidState(),
+                Fluids.EMPTY.defaultFluidState(),
+                Fluids.EMPTY.defaultFluidState(),
+                Fluids.EMPTY.defaultFluidState(),
+                Fluids.EMPTY.defaultFluidState()
+        )));
+    }
+
+    @Test
+    void trueWhenAnyNeighborIsFlowingWater() {
+        assertTrue(AdjacentWaterCheck.hasAdjacentWater(List.of(
+                Fluids.EMPTY.defaultFluidState(),
+                Fluids.FLOWING_WATER.defaultFluidState(),
                 Fluids.EMPTY.defaultFluidState(),
                 Fluids.EMPTY.defaultFluidState(),
                 Fluids.EMPTY.defaultFluidState(),
