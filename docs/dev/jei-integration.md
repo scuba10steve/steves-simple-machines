@@ -86,10 +86,18 @@ dependencies {
 - **`runtimeOnly`** on the full JEI mod jar, declared only in `neoforge/build.gradle` (not in the shared
   `ssm.neoforge-mod` convention plugin, and not in `gametest/build.gradle`): this makes JEI present in the dev
   environment (`runClient`, and anywhere `neoforge`'s runtime classpath is used) so the integration can actually be
-  exercised during development, without making JEI a compile-time or `neoforge.mods.toml` dependency of the shipped
-  mod. It is deliberately **not** added to `gametest/`'s dependencies — the gametest suite exercises machine/generator
-  gameplay via `NeoForge.EVENT_BUS`/`GameTestHelper`, not JEI's own GUI, so it doesn't need JEI on its classpath at
-  runtime.
+  exercised during development, without making JEI a compile-time dependency of the shipped mod. It is deliberately
+  **not** added to `gametest/`'s dependencies — the gametest suite exercises machine/generator gameplay via
+  `NeoForge.EVENT_BUS`/`GameTestHelper`, not JEI's own GUI, so it doesn't need JEI on its classpath at runtime.
+- **`neoforge.mods.toml`** declares JEI as `type = "optional"` (see `neoforge/src/main/resources/META-INF/neoforge.mods.toml`),
+  with `versionRange = "${jei_version_range}"` substituted from `gradle.properties` at build time, same mechanism as
+  the `neoforge`/`minecraft` entries. An `optional` dependency does **not** make the mod refuse to load without JEI —
+  `ssm` loads fine either way, exactly as before. What it adds: if a user *does* have JEI installed but an
+  incompatible version, NeoForge's own dependency resolver shows a clean "incompatible dependency" screen before
+  `SsmJeiPlugin` (annotated `@JeiPlugin`) ever gets instantiated against a mismatched API, instead of a confusing
+  runtime crash during JEI's own plugin discovery. This entry was missing for a while — an earlier version of this
+  doc described omitting it entirely as part of "keeping JEI optional," which conflated the (correct) avoidance of a
+  compile-time/bundled dependency with the (unnecessary) avoidance of an `optional`-typed toml entry.
 
 If you add JEI API usage anywhere outside `compat/jei/`, keep it behind the same `compileOnly` boundary — anything
 that unconditionally imports a JEI class at runtime (outside a class JEI itself instantiates via `@JeiPlugin`) would

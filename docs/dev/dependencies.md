@@ -43,6 +43,13 @@ Last checked: 2026-09-23
 JEI 19.27.0.340 targets NeoForge 1.21.1. Both the API artifacts (`jei-1.21.1-common-api`, `jei-1.21.1-neoforge-api`)
 and the runtime mod jar (`jei-1.21.1-neoforge`) must stay on matching versions.
 
+`jei_version_range=[19.27.0,20)` in `gradle.properties` is what's shipped in `neoforge.mods.toml` as an
+`optional`-typed dependency on `jei` (via `processResources`' token substitution, same mechanism as
+`neoforge_version_range` above) — separate from the exact build version pulled at compile/runtime. Being
+`optional` (not `required`) means `ssm` still loads fine with no JEI installed at all; the version range only
+matters if JEI *is* present, so an incompatible version fails cleanly at NeoForge's own dependency-resolution
+step instead of crashing during JEI's plugin discovery.
+
 ## Maven Repositories
 
 Declared in `buildSrc/src/main/groovy/ssm.repositories.gradle`:
