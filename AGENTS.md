@@ -27,49 +27,65 @@ Before working on any area of the codebase, read the relevant doc in `docs/dev/`
 
 ```text
 steves-simple-machines/
-  build.gradle, settings.gradle, gradle.properties  Root single-module build (no core/neoforge split)
-  gradlew, gradlew.bat, gradle/                      Gradle wrapper
+  settings.gradle, gradle.properties   Root project is inert: includes core/neoforge/gametest, no root build.gradle
+  gradlew, gradlew.bat, gradle/         Gradle wrapper
 
-  buildSrc/                       Convention plugins shared by the root project and gametest/
+  buildSrc/                       Convention plugins shared by core, neoforge, and gametest
     src/main/groovy/
-      ssm.conventions.gradle      java + net.neoforged.moddev + repositories + JUnit platform
+      ssm.conventions.gradle      Bare java + ssm.repositories + JUnit platform (no NeoForge)
+      ssm.neoforge-mod.gradle     NeoForge-specific convention: net.neoforged.moddev + client/server runs + JEI
+                                   compileOnly deps; applied by neoforge/ and gametest/, not core/
       ssm.repositories.gradle     Maven repos: NeoForged, Mojang, Jared (JEI), Modrinth
 
-  src/main/java/io/github/scuba10steve/ssm/
-    Ssm.java                      @Mod entry point; registers everything on the mod event bus
-    ref/RefStrings.java           MODID constant ("ssm")
-    registry/                     DeferredRegister holders: ModBlocks, ModItems, ModBlockEntities,
-                                   ModMenuTypes, ModRecipes, ModCreativeTabs, ModCapabilities, ModClientSetup
-    config/SsmConfig.java         ModConfigSpec; written to config/ssm-common.toml
-    energy/SimpleEnergyStorage.java  Shared FE buffer used by every machine and generator
-    machine/                      Generic processing-machine framework (see machine-framework.md):
-                                   MachineConfig, MachineRecipeLookup, MachineRecipeResult, SsmMachineRecipe,
-                                   ProcessingMachineState, ProcessingMachineBlockEntity, ProcessingMachineBlock,
-                                   ProcessingMachineMenu, ProcessingMachineScreen, MachineConfigs (CRUSHER,
-                                   SMELTER, SAWMILL), SmelterAdapter
-    recipe/                       Custom recipe types: CrushingRecipe, SawingRecipe (Smelter reuses vanilla
-                                   minecraft:smelting)
-    generator/                    The 4 generators, each its own Menu + Screen, sharing GeneratorBlock<T> and the
-                                   abstract GeneratorBlockEntity base (FE buffer, push-to-neighbor loop, energy NBT,
-                                   ContainerData lo/hi helpers): CombustionGeneratorBlockEntity (+ CombustionBurnState),
-                                   SolarPanelBlockEntity, WaterWheelBlockEntity (+ AdjacentWaterCheck),
-                                   WindTurbineBlockEntity (+ SkyColumnCheck)
-    compat/jei/                   SsmJeiPlugin, CrushingCategory, SawingCategory (see jei-integration.md)
+  core/                            Platform-agnostic module: neoFormVersion only (vanilla MC classes, no
+                                    NeoForge APIs)
+    build.gradle                   Applies ssm.conventions + net.neoforged.moddev directly (neoFormVersion, not
+                                    full NeoForge); exposes a `coreOutput` consumable configuration
+    src/main/java/io/github/scuba10steve/ssm/
+      ref/RefStrings.java          MODID constant ("ssm")
+      machine/                     MachineRecipeLookup, MachineRecipeResult, SsmMachineRecipe, SmelterAdapter,
+                                    MachineInventory (inventory abstraction), ProcessingMachineState (implements
+                                    MachineInventory instead of depending on NeoForge's ItemStackHandler)
+      generator/                   CombustionBurnState, AdjacentWaterCheck, SkyColumnCheck
+    src/test/java/io/github/scuba10steve/ssm/   16 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
+                                    CombustionBurnStateTest, AdjacentWaterCheckTest, SkyColumnCheckTest,
+                                    FakeMachineInventory (test fixture)
 
-  src/main/resources/
-    META-INF/neoforge.mods.toml
-    data/ssm/recipe/               crushing/, sawing/, smelting/, crafting/
-    assets/ssm/textures/gui/       Shared processing-machine GUI texture
+  neoforge/                        NeoForge runtime module — everything not listed under core/ above
+    build.gradle                   Applies ssm.neoforge-mod (full modded classpath); a `coreClasses` resolvable
+                                    configuration consumes core's `coreOutput` and folds it into the jar; JEI
+                                    runtimeOnly dep; depends on :core
+    src/main/java/io/github/scuba10steve/ssm/
+      Ssm.java                     @Mod entry point; registers everything on the mod event bus
+      config/SsmConfig.java        ModConfigSpec; written to config/ssm-common.toml
+      energy/SimpleEnergyStorage.java  Shared FE buffer used by every machine and generator
+      registry/                    DeferredRegister holders: ModBlocks, ModItems, ModBlockEntities,
+                                    ModMenuTypes, ModRecipes, ModCreativeTabs, ModCapabilities, ModClientSetup
+      recipe/                      CrushingRecipe, SawingRecipe (Smelter reuses vanilla minecraft:smelting)
+      machine/                     MachineConfig, MachineConfigs (CRUSHER, SMELTER, SAWMILL),
+                                    ProcessingMachineBlock, ProcessingMachineBlockEntity, ProcessingMachineMenu,
+                                    ProcessingMachineScreen, ItemStackHandlerInventory (adapter wrapping a real
+                                    ItemStackHandler to implement core's MachineInventory)
+      generator/                   GeneratorBlock<T> + abstract GeneratorBlockEntity base (FE buffer,
+                                    push-to-neighbor loop, energy NBT, ContainerData lo/hi helpers), plus each of
+                                    the 4 generators' BlockEntity/Menu/Screen: Combustion, SolarPanel, WaterWheel,
+                                    WindTurbine
+      compat/jei/                  SsmJeiPlugin, CrushingCategory, SawingCategory (see jei-integration.md)
+    src/main/resources/
+      META-INF/neoforge.mods.toml
+      data/ssm/recipe/              crushing/, sawing/, smelting/, crafting/
+      assets/ssm/textures/gui/      Shared processing-machine GUI texture
+    src/test/java/io/github/scuba10steve/ssm/   9 unit tests: SimpleEnergyStorageTest, CrushingRecipeTest,
+                                    SawingRecipeTest
 
-  src/test/java/io/github/scuba10steve/ssm/   Unit tests (22 tests): energy/, machine/, recipe/, generator/
-
-  gametest/                        Separate Gradle subproject (ModDevGradle's moddev plugin needs one
-                                    neoForge{} extension per project, so this can't be a source set of the
-                                    root build)
-    build.gradle                   Applies ssm.conventions, adds root project's main sourceSet to the ssm mod
+  gametest/                        Separate Gradle subproject depending on both :core and :neoforge
+                                    (ModDevGradle's moddev plugin needs one neoForge{} extension per project, so
+                                    this can't be a source set of either)
+    build.gradle                   Applies ssm.neoforge-mod; adds :core's and :neoforge's main sourceSets to the
+                                    ssm mod
     src/main/java/io/github/scuba10steve/ssm/gametest/
-                                    CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest
-                                    (18 gametests total)
+                                    CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest,
+                                    BlockDropGameTest (23 gametests total)
 
   docs/dev/                        This documentation
   AGENTS.md, README.md, CHANGELOG.md, cliff.toml
@@ -101,9 +117,11 @@ steves-simple-machines/
 
 ## Key Codebase Conventions
 
-- **Single module:** Unlike `steves-simple-storage`, this project has no `core`/`neoforge` split — everything lives in
-  the root project's `src/main/java`. `gametest/` is a separate Gradle subproject purely because ModDevGradle requires
-  one `neoForge {}` extension per project; it depends on the root project and is not a platform boundary.
+- **Multi-module split:** Like `steves-simple-storage`, this project has a `core`/`neoforge` split — `core` is
+  platform-agnostic (built against `neoFormVersion`: vanilla MC classes only, no NeoForge APIs) and `neoforge` holds
+  everything that needs real NeoForge APIs (registration, block entities, menus/screens, config, JEI compat).
+  `neoforge` depends on `core` via a `coreOutput`/`coreClasses` Gradle configuration pair. `gametest/` is a separate
+  Gradle subproject depending on both, purely because ModDevGradle requires one `neoForge {}` extension per project.
 - **Machine framework over new classes:** Adding a 4th, 5th, ... processing machine should almost never require a new
   `BlockEntity`, `Menu`, or `Screen` class. It requires a new `MachineRecipeLookup` + `MachineConfig` entry in
   `MachineConfigs`, new registry entries (`ModBlockEntities`, `ModMenuTypes`, `ModBlocks`, `ModItems`), and a new
@@ -116,7 +134,7 @@ steves-simple-machines/
   `Capabilities.EnergyStorage.BLOCK`; machines only ever receive. See
   [docs/dev/energy-system.md](docs/dev/energy-system.md).
 - **Registration flow:** New blocks/items/entities/menus/recipes follow the existing `DeferredRegister` patterns in
-  `src/main/java/io/github/scuba10steve/ssm/registry/`.
+  `neoforge/src/main/java/io/github/scuba10steve/ssm/registry/`.
 - **JEI is compile/runtime-only:** JEI API is `compileOnly`, the JEI jar itself is `runtimeOnly` — the mod must
   compile and run without JEI installed. See [docs/dev/jei-integration.md](docs/dev/jei-integration.md).
 

@@ -62,7 +62,7 @@ cd steves-simple-machines
 
 On Windows: `gradlew.bat build`
 
-The built jar is at `build/libs/ssm-<version>.jar`.
+The built jar is at `neoforge/build/libs/ssm-<version>.jar`.
 
 ### Development
 
@@ -89,28 +89,40 @@ open build/reports/tests/test/index.html
 
 ### Project Structure
 
-This is a **single-module** Gradle project — there is no `core`/`neoforge` split. `gametest/` is a separate Gradle
-subproject only because NeoForge's ModDevGradle plugin requires one `neoForge {}` extension per project.
+This is a **two-module** Gradle project: `core` (platform-agnostic, vanilla MC classes only) and `neoforge` (the
+NeoForge runtime module, depending on `core`). `gametest/` is a separate Gradle subproject depending on both, because
+NeoForge's ModDevGradle plugin requires one `neoForge {}` extension per project.
 
 ```
 steves-simple-machines/
-├── src/
-│   ├── main/java/io/github/scuba10steve/ssm/
-│   │   ├── Ssm.java              # @Mod entry point
-│   │   ├── registry/             # DeferredRegister holders
-│   │   ├── config/                # SsmConfig (ssm-common.toml)
-│   │   ├── energy/                 # SimpleEnergyStorage
-│   │   ├── machine/                # Generic processing-machine framework + MachineConfigs
-│   │   ├── recipe/                 # CrushingRecipe, SawingRecipe
-│   │   ├── generator/               # The 4 generators + shared GeneratorBlock
-│   │   └── compat/jei/               # JEI plugin and recipe categories
-│   ├── main/resources/             # neoforge.mods.toml, data/, assets/
-│   └── test/java/                  # Unit tests
-├── gametest/                        # NeoForge GameTest subproject
-│   └── src/main/java/.../gametest/  # CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest
-├── buildSrc/                        # ssm.conventions / ssm.repositories convention plugins
-├── docs/dev/                        # Developer documentation
-├── build.gradle, settings.gradle, gradle.properties
+├── core/                              # Platform-agnostic module (neoFormVersion only, no NeoForge APIs)
+│   └── src/
+│       ├── main/java/io/github/scuba10steve/ssm/
+│       │   ├── ref/                   # RefStrings
+│       │   ├── machine/               # MachineRecipeLookup, SsmMachineRecipe, SmelterAdapter, MachineInventory,
+│       │   │                          #   ProcessingMachineState
+│       │   └── generator/             # CombustionBurnState, AdjacentWaterCheck, SkyColumnCheck
+│       └── test/java/                 # 16 unit tests
+├── neoforge/                          # NeoForge runtime module — everything else
+│   └── src/
+│       ├── main/java/io/github/scuba10steve/ssm/
+│       │   ├── Ssm.java               # @Mod entry point
+│       │   ├── registry/              # DeferredRegister holders
+│       │   ├── config/                # SsmConfig (ssm-common.toml)
+│       │   ├── energy/                # SimpleEnergyStorage
+│       │   ├── machine/               # ProcessingMachineBlock/BlockEntity/Menu/Screen, MachineConfigs,
+│       │   │                          #   ItemStackHandlerInventory
+│       │   ├── recipe/                # CrushingRecipe, SawingRecipe
+│       │   ├── generator/             # The 4 generators + shared GeneratorBlock/GeneratorBlockEntity
+│       │   └── compat/jei/            # JEI plugin and recipe categories
+│       ├── main/resources/            # neoforge.mods.toml, data/, assets/
+│       └── test/java/                 # 9 unit tests
+├── gametest/                          # NeoForge GameTest subproject (depends on :core and :neoforge)
+│   └── src/main/java/.../gametest/    # CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest,
+│                                       #   BlockDropGameTest (23 gametests total)
+├── buildSrc/                          # ssm.conventions / ssm.neoforge-mod / ssm.repositories convention plugins
+├── docs/dev/                          # Developer documentation
+├── settings.gradle, gradle.properties # Root project is inert — no root build.gradle
 └── AGENTS.md, README.md, CHANGELOG.md, cliff.toml
 ```
 

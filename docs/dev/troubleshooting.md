@@ -28,9 +28,11 @@ Unsupported class file major version
 ### "cannot enable modding in the same project twice"
 
 This NeoGradle error means `neoForge { version = ... }` was set more than once for the same Gradle project.
-`gametest/build.gradle` already gets modding enabled via `ssm.conventions`; its own `neoForge {}` block must only
-*extend* the existing `runs`/`mods` configuration (adding the `gameTestServer` run and the root project's source
-set to the `ssm` mod), never re-assign `version`.
+`neoforge/build.gradle` and `gametest/build.gradle` both already get modding enabled (with a version) via the
+`ssm.neoforge-mod` convention plugin; each project's own `neoForge {}` block must only *extend* the existing
+`runs`/`mods` configuration (e.g. `gametest/build.gradle` adding the `gameTestServer` run and `core`'s/`neoforge`'s
+source sets to the `ssm` mod), never re-assign `version`. `core/build.gradle` is unaffected by this guard — it applies
+`net.neoforged.moddev` directly (not through `ssm.neoforge-mod`) and only sets `neoFormVersion`, not `version`.
 
 ## GameTest Issues
 
@@ -49,19 +51,22 @@ uses a different namespace than `ssm`, the test silently won't run. Check the co
 ### Gametest can't find game content (blocks, recipes)
 
 `gametest/` is a separate Gradle project with its own `sourceSets.main`, which contains only test code — no blocks,
-items, or recipes of its own. The root project's actual game content only becomes visible to the gametest server
-because `gametest/build.gradle` explicitly adds it:
+items, or recipes of its own. `core`'s and `neoforge`'s actual content only become visible to the gametest server
+because `gametest/build.gradle` explicitly adds both source sets:
 
 ```gradle
 mods {
     ssm {
-        modSourceSets.add(providers.provider { project(':').sourceSets.main })
+        modSourceSets.add(providers.provider { project(':core').sourceSets.main })
+        modSourceSets.add(providers.provider { project(':neoforge').sourceSets.main })
     }
 }
 ```
 
-If this line is ever removed or the root project's source set changes shape, gametests will fail to find blocks
-registered in the root project's `ModBlocks`.
+Blocks, items, and recipe registration (`ModBlocks`, etc.) live in `neoforge`, not `core` — if the `:neoforge` line is
+ever removed, or `neoforge`'s source set changes shape, gametests will fail to find blocks registered there. Removing
+the `:core` line would similarly break anything gametests exercise that depends on `core`'s pure logic classes (e.g.
+`MachineRecipeLookup` implementations used by `neoforge`'s `MachineConfigs`).
 
 ## Unit Test Issues
 
