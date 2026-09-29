@@ -53,8 +53,10 @@ output (generators).
 
 [wind_turbine]
     capacity = 30000
-    generation_rate = 30       # FE generated per tick while unobstructed to the sky
+    generation_rate = 30       # FE generated per tick while at/above min_height with min_free_neighbors open
     max_output = 120
+    min_height = 100           # minimum Y-level required to generate
+    min_free_neighbors = 5     # minimum number of the 6 adjacent positions that must be air
 ```
 
 **Notes:**

@@ -35,7 +35,7 @@ steves-simple-machines/
 │   │                          #   (vanilla MC classes, no NeoForge APIs); exposes `coreOutput`
 │   └── src/
 │       ├── main/java/        # Platform-agnostic mod code (see AGENTS.md for the file list)
-│       └── test/java/        # Unit tests (16 tests)
+│       └── test/java/        # Unit tests (19 tests)
 ├── neoforge/
 │   ├── build.gradle          # Applies ssm.neoforge-mod, sets archivesName, JEI runtimeOnly,
 │   │                          #   neoforge.mods.toml token substitution, consumes core's `coreOutput` via
@@ -47,7 +47,7 @@ steves-simple-machines/
 ├── gametest/
 │   ├── build.gradle          # Applies ssm.neoforge-mod; adds :core's and :neoforge's main sourceSets to the
 │   │                          #   ssm mod; defines the gameTestServer run
-│   └── src/main/java/        # GameTest classes (23 gametests)
+│   └── src/main/java/        # GameTest classes (24 gametests)
 └── docs/                     # This documentation
 ```
 

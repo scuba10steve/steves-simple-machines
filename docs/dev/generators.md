@@ -78,16 +78,23 @@ not-generating even while water remains adjacent (`GeneratorGameTest#waterWheelD
 
 ## Wind Turbine
 
-Condition, in `WindTurbineBlockEntity.tick`: generates whenever the column above the block is clear to the sky
-(`level.canSeeSky(pos.above())`). Note that the block entity calls `Level#canSeeSky` **directly** rather than through
-`SkyColumnCheck` — `SkyColumnCheck.isColumnClear(List<Boolean>)` exists as a pure, unit-tested helper for the general
-"is every step in a column clear" predicate (`SkyColumnCheckTest`), but the actual runtime condition only needs a
-single vanilla sky-visibility check at one position, so the block entity doesn't route through it. If a future
-change needs a multi-block-tall clearance check (e.g. requiring N clear blocks above rather than just sky visibility
-from the block itself), wire `WindTurbineBlockEntity` through `SkyColumnCheck` at that point.
+Condition, in `WindTurbineBlockEntity.tick`: generates whenever it is both high enough (`pos.getY() >=
+min_height`) **and** sufficiently exposed (at least `min_free_neighbors` of its 6 adjacent positions are air).
+Both thresholds are `SsmConfig` values (`WIND_TURBINE_MIN_HEIGHT`, `WIND_TURBINE_MIN_FREE_NEIGHBORS`).
 
-Like the Water Wheel, `isGenerating()` reflects `clearToSky && generateAndMarkChanged(rate)`, so a full buffer
-correctly reports not-generating even under clear sky
+Unlike Solar Panel (which genuinely needs direct sunlight, and so correctly uses `level.canSeeSky`), Wind Turbine
+originally reused `level.canSeeSky(pos.above())` too — a weather/light-visibility check, not a wind-relevant one,
+since Minecraft has no actual wind simulation to check against. That was replaced with a height + open-neighbor
+check that's thematically closer to "elevated and not boxed in," implemented as `WindExposureCheck.isExposed(int y,
+int minHeight, List<Boolean> isNeighborAir, int minFreeNeighbors)` — a pure, unit-tested class (`WindExposureCheckTest`)
+following the same pattern as `AdjacentWaterCheck`: the impure part (fetching each neighbor's block state, which
+needs a live `Level`) stays in `WindTurbineBlockEntity#tick`, and the pure predicate logic is extracted for
+testability. This superseded the earlier `SkyColumnCheck` class (which, notably, was never actually wired into any
+block entity — it was dead code from the start, extracted in anticipation of a multi-block-tall clearance check that
+never got built); `SkyColumnCheck`/`SkyColumnCheckTest` were removed rather than left alongside the new class.
+
+Like the Water Wheel, `isGenerating()` reflects `exposed && generateAndMarkChanged(rate)`, so a full buffer
+correctly reports not-generating even when high enough and exposed
 (`GeneratorGameTest#windTurbineDoesNotReportGeneratingWhenBufferFull`).
 
 ## Config-driven rates

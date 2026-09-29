@@ -46,9 +46,9 @@ steves-simple-machines/
       machine/                     MachineRecipeLookup, MachineRecipeResult, SsmMachineRecipe, SmelterAdapter,
                                     MachineInventory (inventory abstraction), ProcessingMachineState (depends on
                                     MachineInventory instead of NeoForge's ItemStackHandler directly)
-      generator/                   CombustionBurnState, AdjacentWaterCheck, SkyColumnCheck
-    src/test/java/io/github/scuba10steve/ssm/   16 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
-                                    CombustionBurnStateTest, AdjacentWaterCheckTest, SkyColumnCheckTest,
+      generator/                   CombustionBurnState, AdjacentWaterCheck, WindExposureCheck
+    src/test/java/io/github/scuba10steve/ssm/   19 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
+                                    CombustionBurnStateTest, AdjacentWaterCheckTest, WindExposureCheckTest,
                                     FakeMachineInventory (test fixture)
 
   neoforge/                        NeoForge runtime module — everything not listed under core/ above
@@ -85,7 +85,7 @@ steves-simple-machines/
                                     ssm mod
     src/main/java/io/github/scuba10steve/ssm/gametest/
                                     CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest,
-                                    BlockDropGameTest (23 gametests total)
+                                    BlockDropGameTest (24 gametests total)
 
   docs/dev/                        This documentation
   AGENTS.md, README.md, CHANGELOG.md, cliff.toml
@@ -129,7 +129,7 @@ steves-simple-machines/
   [docs/dev/machine-framework.md](docs/dev/machine-framework.md).
 - **Testable pure logic:** State-machine and condition-check logic that doesn't need a live `Level` is extracted into
   small, pure, unit-testable classes (`ProcessingMachineState`, `CombustionBurnState`, `AdjacentWaterCheck`,
-  `SkyColumnCheck`) rather than being buried inside a `BlockEntity#tick`. Follow this pattern for new logic.
+  `WindExposureCheck`) rather than being buried inside a `BlockEntity#tick`. Follow this pattern for new logic.
 - **Energy is push-based:** Generators push FE to neighbors on their own tick via
   `Capabilities.EnergyStorage.BLOCK`; machines only ever receive. See
   [docs/dev/energy-system.md](docs/dev/energy-system.md).

@@ -23,7 +23,7 @@ capability, so it interoperates with any other FE-based mod. Includes JEI integr
 | **Combustion Generator**   | Generator  | Any vanilla or modded furnace fuel (coal, charcoal, sticks, etc.) | FE                                 | Burns fuel; pauses (doesn't waste fuel) when its buffer is full |
 | **Solar Panel**            | Generator  | Daylight + clear sky above                | FE                                 | Generates only during the day with direct sky access             |
 | **Water Wheel**            | Generator  | Adjacent water                            | FE                                 | Generates whenever any of the 6 neighbors is water                |
-| **Wind Turbine**           | Generator  | Clear sky above                           | FE                                 | Generates whenever the block can see the sky                     |
+| **Wind Turbine**           | Generator  | High altitude + open surroundings         | FE                                 | Generates above a configurable min height with most sides unobstructed |
 
 Generators automatically push their generated FE to any adjacent block that can receive it (including other mods'
 FE-capable machines) — no cables or wires required for direct adjacency.
@@ -101,8 +101,8 @@ steves-simple-machines/
 │       │   ├── ref/                   # RefStrings
 │       │   ├── machine/               # MachineRecipeLookup, SsmMachineRecipe, SmelterAdapter, MachineInventory,
 │       │   │                          #   ProcessingMachineState
-│       │   └── generator/             # CombustionBurnState, AdjacentWaterCheck, SkyColumnCheck
-│       └── test/java/                 # 16 unit tests
+│       │   └── generator/             # CombustionBurnState, AdjacentWaterCheck, WindExposureCheck
+│       └── test/java/                 # 19 unit tests
 ├── neoforge/                          # NeoForge runtime module — everything else
 │   └── src/
 │       ├── main/java/io/github/scuba10steve/ssm/
@@ -119,7 +119,7 @@ steves-simple-machines/
 │       └── test/java/                 # 9 unit tests
 ├── gametest/                          # NeoForge GameTest subproject (depends on :core and :neoforge)
 │   └── src/main/java/.../gametest/    # CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest,
-│                                       #   BlockDropGameTest (23 gametests total)
+│                                       #   BlockDropGameTest (24 gametests total)
 ├── buildSrc/                          # ssm.conventions / ssm.neoforge-mod / ssm.repositories convention plugins
 ├── docs/dev/                          # Developer documentation
 ├── settings.gradle, gradle.properties # Root project is inert — no root build.gradle

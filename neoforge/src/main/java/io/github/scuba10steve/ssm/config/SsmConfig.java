@@ -40,6 +40,8 @@ public class SsmConfig {
     public static final ModConfigSpec.IntValue WIND_TURBINE_CAPACITY;
     public static final ModConfigSpec.IntValue WIND_TURBINE_GENERATION_RATE;
     public static final ModConfigSpec.IntValue WIND_TURBINE_MAX_OUTPUT;
+    public static final ModConfigSpec.IntValue WIND_TURBINE_MIN_HEIGHT;
+    public static final ModConfigSpec.IntValue WIND_TURBINE_MIN_FREE_NEIGHBORS;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -82,8 +84,10 @@ public class SsmConfig {
 
         builder.comment("Wind Turbine").push("wind_turbine");
         WIND_TURBINE_CAPACITY = builder.comment("FE buffer capacity").defineInRange("capacity", 30_000, 1, Integer.MAX_VALUE);
-        WIND_TURBINE_GENERATION_RATE = builder.comment("FE generated per tick while unobstructed to the sky").defineInRange("generation_rate", 30, 0, Integer.MAX_VALUE);
+        WIND_TURBINE_GENERATION_RATE = builder.comment("FE generated per tick while at/above min_height with min_free_neighbors open").defineInRange("generation_rate", 30, 0, Integer.MAX_VALUE);
         WIND_TURBINE_MAX_OUTPUT = builder.comment("Max FE pushed to a neighbor per tick").defineInRange("max_output", 120, 0, Integer.MAX_VALUE);
+        WIND_TURBINE_MIN_HEIGHT = builder.comment("Minimum Y-level required to generate").defineInRange("min_height", 100, -64, 320);
+        WIND_TURBINE_MIN_FREE_NEIGHBORS = builder.comment("Minimum number of the 6 adjacent positions that must be air").defineInRange("min_free_neighbors", 5, 0, 6);
         builder.pop();
 
         SPEC = builder.build();

@@ -1,5 +1,6 @@
 package io.github.scuba10steve.ssm.gametest;
 
+import io.github.scuba10steve.ssm.config.SsmConfig;
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.SolarPanelBlockEntity;
 import io.github.scuba10steve.ssm.generator.WaterWheelBlockEntity;
@@ -33,6 +34,20 @@ public class GeneratorGameTest {
         for (Direction dir : Direction.Plane.HORIZONTAL) {
             helper.setBlock(cell.relative(dir), Blocks.STONE);
         }
+    }
+
+    /**
+     * The gametest dimension's structures sit at a fixed, low absolute Y (well below
+     * WIND_TURBINE_MIN_HEIGHT's default of 100) — {@code POS} alone is nowhere near high enough
+     * for the Wind Turbine's height gate. Computes a relative position whose absolute Y clears
+     * the configured minimum with a comfortable margin, robust to wherever the test dimension
+     * actually places the structure's origin (verified via helper.absolutePos, not a hardcoded
+     * offset guessed from one observed run).
+     */
+    private static BlockPos highEnoughForWindTurbine(GameTestHelper helper) {
+        int targetAbsoluteY = SsmConfig.WIND_TURBINE_MIN_HEIGHT.get() + 10;
+        int originAbsoluteY = helper.absolutePos(BlockPos.ZERO).getY();
+        return new BlockPos(1, targetAbsoluteY - originAbsoluteY, 1);
     }
 
     // --- Combustion Generator ---
@@ -156,28 +171,45 @@ public class GeneratorGameTest {
     // --- Wind Turbine ---
 
     @GameTest(template = "empty")
-    public static void windTurbineProducesEnergyWithClearSky(GameTestHelper helper) {
-        helper.setBlock(POS, ModBlocks.WIND_TURBINE.get());
-        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(POS);
-        // Clear sky above by default in the empty test arena.
+    public static void windTurbineProducesEnergyWhenHighEnoughAndExposed(GameTestHelper helper) {
+        BlockPos highPos = highEnoughForWindTurbine(helper);
+        helper.setBlock(highPos, ModBlocks.WIND_TURBINE.get());
+        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(highPos);
+        // Open on all 6 sides by default in the empty test arena, well above min_height.
 
         helper.runAfterDelay(20, () -> {
-            helper.assertTrue(be.energyStorage.getEnergyStored() > 0, "expected energy stored with clear sky above");
+            helper.assertTrue(be.energyStorage.getEnergyStored() > 0,
+                    "expected energy stored when high enough with open surroundings");
             helper.succeed();
         });
     }
 
     @GameTest(template = "empty")
-    public static void windTurbineProducesNoEnergyUnderRoof(GameTestHelper helper) {
+    public static void windTurbineProducesNoEnergyBelowMinHeight(GameTestHelper helper) {
+        // POS sits well below WIND_TURBINE_MIN_HEIGHT in the gametest dimension, with otherwise
+        // fully open surroundings — isolates the height gate specifically from the free-neighbor
+        // gate exercised by the enclosure test below.
         helper.setBlock(POS, ModBlocks.WIND_TURBINE.get());
         WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(POS);
-        enclose(helper, POS.above());
 
-        // Same reasoning as the covered-solar-panel test: check the live isGenerating() flag,
-        // not accumulated stored energy, since a stray tick of energy generated before the
-        // enclosure's sky-light change finishes propagating would otherwise never drain away.
         helper.runAfterDelay(20, () -> {
-            helper.assertTrue(!be.isGenerating(), "expected turbine to not be generating under a roof");
+            helper.assertTrue(be.energyStorage.getEnergyStored() == 0,
+                    "expected no energy stored below min_height even with open surroundings");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty")
+    public static void windTurbineProducesNoEnergyWhenEnclosed(GameTestHelper helper) {
+        BlockPos highPos = highEnoughForWindTurbine(helper);
+        helper.setBlock(highPos, ModBlocks.WIND_TURBINE.get());
+        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(highPos);
+        // enclose() seals 5 of the 6 neighbors (ceiling + 4 horizontal), leaving only the one
+        // below open — well under min_free_neighbors (5), regardless of height being satisfied.
+        enclose(helper, highPos);
+
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(!be.isGenerating(), "expected turbine to not be generating when enclosed");
             helper.succeed();
         });
     }
@@ -186,11 +218,12 @@ public class GeneratorGameTest {
     public static void windTurbineDoesNotReportGeneratingWhenBufferFull(GameTestHelper helper) {
         // Regression test for the drift where currentlyGenerating tracked "is the condition met"
         // instead of "was energy actually accepted": a full buffer must report not-generating even
-        // though the environmental condition (clear sky) is met.
-        helper.setBlock(POS, ModBlocks.WIND_TURBINE.get());
-        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(POS);
+        // though the environmental condition (high enough + exposed) is met. Must run at a height
+        // that actually satisfies the condition, or this would pass for the wrong reason.
+        BlockPos highPos = highEnoughForWindTurbine(helper);
+        helper.setBlock(highPos, ModBlocks.WIND_TURBINE.get());
+        WindTurbineBlockEntity be = (WindTurbineBlockEntity) helper.getBlockEntity(highPos);
         be.energyStorage.generate(be.energyStorage.getMaxEnergyStored());
-        // Clear sky above by default in the empty test arena.
 
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(be.energyStorage.getEnergyStored() == be.energyStorage.getMaxEnergyStored(),

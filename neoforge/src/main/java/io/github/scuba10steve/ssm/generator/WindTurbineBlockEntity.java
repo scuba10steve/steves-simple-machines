@@ -4,6 +4,7 @@ import io.github.scuba10steve.ssm.config.SsmConfig;
 import io.github.scuba10steve.ssm.registry.ModBlockEntities;
 import io.github.scuba10steve.ssm.registry.ModMenuTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -11,6 +12,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Arrays;
 
 public class WindTurbineBlockEntity extends GeneratorBlockEntity {
 
@@ -61,9 +64,15 @@ public class WindTurbineBlockEntity extends GeneratorBlockEntity {
     public static void tick(Level level, BlockPos pos, BlockState state, WindTurbineBlockEntity be) {
         if (level.isClientSide()) return;
 
-        boolean clearToSky = level.canSeeSky(pos.above());
+        boolean exposed = WindExposureCheck.isExposed(
+                pos.getY(),
+                SsmConfig.WIND_TURBINE_MIN_HEIGHT.get(),
+                Arrays.stream(Direction.values())
+                        .map(dir -> level.getBlockState(pos.relative(dir)).isAir())
+                        .toList(),
+                SsmConfig.WIND_TURBINE_MIN_FREE_NEIGHBORS.get());
 
-        be.currentlyGenerating = clearToSky && be.generateAndMarkChanged(SsmConfig.WIND_TURBINE_GENERATION_RATE.get());
+        be.currentlyGenerating = exposed && be.generateAndMarkChanged(SsmConfig.WIND_TURBINE_GENERATION_RATE.get());
 
         be.pushEnergyToNeighbors(level, pos, SsmConfig.WIND_TURBINE_MAX_OUTPUT.get());
     }
