@@ -2,7 +2,6 @@ package io.github.scuba10steve.ssm.machine;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,12 +12,12 @@ public class ProcessingMachineState {
     /** energyConsumed is true only on a tick that actually incremented progress — never on a tick spent parked at completion waiting for output space. */
     public record TickOutcome(boolean completed, boolean energyConsumed) {}
 
-    private final ItemStackHandler inventory;
+    private final MachineInventory inventory;
     private final int outputSlotCount;
     private final MachineRecipeLookup recipeLookup;
     private int progress;
 
-    public ProcessingMachineState(ItemStackHandler inventory, int outputSlotCount, MachineRecipeLookup recipeLookup) {
+    public ProcessingMachineState(MachineInventory inventory, int outputSlotCount, MachineRecipeLookup recipeLookup) {
         this.inventory = inventory;
         this.outputSlotCount = outputSlotCount;
         this.recipeLookup = recipeLookup;

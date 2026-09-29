@@ -1,8 +1,10 @@
 package io.github.scuba10steve.ssm.machine;
 
+import net.minecraft.SharedConstants;
+import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,6 +13,16 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProcessingMachineStateTest {
+
+    // Same rationale as AdjacentWaterCheckTest: this module's neoFormVersion-only classpath has
+    // no modded harness to bootstrap vanilla's registries, and Items/ItemStack's static init
+    // touches BuiltInRegistries, which asserts Bootstrap.bootStrap() already ran. bootStrap() is
+    // idempotent, so calling it here is safe regardless of what other test classes also do.
+    @BeforeAll
+    static void bootstrapRegistries() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+    }
 
     private static MachineRecipeLookup fixedResultLookup(ItemStack expectedInput, MachineRecipeResult result) {
         return (level, input) -> ItemStack.isSameItemSameComponents(input, expectedInput)
@@ -22,7 +34,7 @@ class ProcessingMachineStateTest {
     void advancesProgressWhenEnergyAvailableAndRecipeMatches() {
         ItemStack input = new ItemStack(Items.RAW_IRON);
         MachineRecipeResult result = new MachineRecipeResult(List.of(new ItemStack(Items.IRON_NUGGET, 2)), 5);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 1, fixedResultLookup(input, result));
@@ -36,7 +48,7 @@ class ProcessingMachineStateTest {
     void doesNotAdvanceProgressWithoutEnergy() {
         ItemStack input = new ItemStack(Items.RAW_IRON);
         MachineRecipeResult result = new MachineRecipeResult(List.of(new ItemStack(Items.IRON_NUGGET, 2)), 5);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 1, fixedResultLookup(input, result));
@@ -50,7 +62,7 @@ class ProcessingMachineStateTest {
         ItemStack input = new ItemStack(Items.RAW_IRON, 1);
         ItemStack outputStack = new ItemStack(Items.IRON_NUGGET, 2);
         MachineRecipeResult result = new MachineRecipeResult(List.of(outputStack), 1);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 1, fixedResultLookup(input, result));
@@ -66,7 +78,7 @@ class ProcessingMachineStateTest {
     void pausesAtCompletionWhenOutputSlotFull() {
         ItemStack input = new ItemStack(Items.RAW_IRON, 1);
         MachineRecipeResult result = new MachineRecipeResult(List.of(new ItemStack(Items.IRON_NUGGET, 2)), 1);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
         inventory.setStackInSlot(1, new ItemStack(Items.IRON_NUGGET, 64)); // full, blocks insertion
 
@@ -81,7 +93,7 @@ class ProcessingMachineStateTest {
     void resetsProgressWhenInputNoLongerMatches() {
         ItemStack input = new ItemStack(Items.RAW_IRON, 1);
         MachineRecipeResult result = new MachineRecipeResult(List.of(new ItemStack(Items.IRON_NUGGET, 2)), 5);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 1, fixedResultLookup(input, result));
@@ -97,7 +109,7 @@ class ProcessingMachineStateTest {
     void doesNotConsumeEnergyOnTicksSpentWaitingForOutputSpace() {
         ItemStack input = new ItemStack(Items.RAW_IRON, 1);
         MachineRecipeResult result = new MachineRecipeResult(List.of(new ItemStack(Items.IRON_NUGGET, 2)), 1);
-        ItemStackHandler inventory = new ItemStackHandler(2);
+        FakeMachineInventory inventory = new FakeMachineInventory(2);
         inventory.setStackInSlot(0, input);
         inventory.setStackInSlot(1, new ItemStack(Items.IRON_NUGGET, 64)); // full, blocks insertion
 
@@ -124,7 +136,7 @@ class ProcessingMachineStateTest {
         ItemStack sawdust = new ItemStack(Items.STICK, 1); // stand-in for ssm:sawdust
         MachineRecipeResult result = new MachineRecipeResult(List.of(planks, sawdust), 1);
 
-        ItemStackHandler inventory = new ItemStackHandler(3); // 1 input + 2 output slots
+        FakeMachineInventory inventory = new FakeMachineInventory(3); // 1 input + 2 output slots
         inventory.setStackInSlot(0, input);
 
         ProcessingMachineState state = new ProcessingMachineState(inventory, 2, fixedResultLookup(input, result));
@@ -156,7 +168,7 @@ class ProcessingMachineStateTest {
         ItemStack sawdust = new ItemStack(Items.STICK, 1); // stand-in for ssm:sawdust
         MachineRecipeResult result = new MachineRecipeResult(List.of(planks, sawdust), 1);
 
-        ItemStackHandler inventory = new ItemStackHandler(3); // 1 input + 2 output slots
+        FakeMachineInventory inventory = new FakeMachineInventory(3); // 1 input + 2 output slots
         inventory.setStackInSlot(0, input);
         // Slot 1 is full of an unrelated item (matches neither output), leaving slot 2 as the
         // only free slot — but two distinct new items need two distinct slots.

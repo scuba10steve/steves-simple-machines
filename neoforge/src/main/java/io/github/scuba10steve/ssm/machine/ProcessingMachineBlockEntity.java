@@ -64,7 +64,7 @@ public class ProcessingMachineBlockEntity extends BlockEntity implements MenuPro
             }
         };
         this.energyStorage = new SimpleEnergyStorage(config.energyCapacity().getAsInt(), Integer.MAX_VALUE, 0);
-        this.state = new ProcessingMachineState(inventory, config.outputSlotCount(), config.recipeLookup());
+        this.state = new ProcessingMachineState(new ItemStackHandlerInventory(inventory), config.outputSlotCount(), config.recipeLookup());
     }
 
     public int getProgress() {
