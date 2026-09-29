@@ -1,0 +1,42 @@
+plugins {
+    id 'net.neoforged.moddev'
+    id 'ssm.conventions'
+}
+
+version = rootProject.mod_version
+group = 'io.github.scuba10steve'
+
+base {
+    archivesName = 'ssm-core'
+}
+
+neoForge {
+    // neoFormVersion gives us vanilla MC classes only — no NeoForge APIs
+    neoFormVersion = "${minecraft_version}-20240808.144430"
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// net.neoforged.moddev wires the vanilla (neoFormVersion) classpath onto the main source
+// set's compileClasspath only, not test's — extend it explicitly so tests can see
+// net.minecraft classes (e.g. AdjacentWaterCheckTest, SmeltingLookupTest).
+configurations.testCompileClasspath.extendsFrom(configurations.compileClasspath)
+configurations.testRuntimeClasspath.extendsFrom(configurations.runtimeClasspath)
+
+test {
+    useJUnitPlatform()
+}
+
+configurations {
+    coreOutput {
+        canBeConsumed = true
+        canBeResolved = false
+    }
+}
+artifacts {
+    coreOutput(compileJava.destinationDirectory) { builtBy compileJava }
+    coreOutput(sourceSets.main.output.resourcesDir) { builtBy processResources }
+}

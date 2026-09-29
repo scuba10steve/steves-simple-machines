@@ -16,4 +16,6 @@ plugins {
 }
 
 rootProject.name = 'steves-simple-machines'
+include 'core'
+include 'neoforge'
 include 'gametest'

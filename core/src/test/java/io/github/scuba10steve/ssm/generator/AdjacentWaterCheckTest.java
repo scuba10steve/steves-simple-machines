@@ -1,6 +1,8 @@
 package io.github.scuba10steve.ssm.generator;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.Bootstrap;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.material.Fluids;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,16 +18,17 @@ class AdjacentWaterCheckTest {
     // AdjacentWaterCheck's production code checks FluidTags.WATER (the correct, mod-compatible
     // behavior: any fluid tagged #minecraft:water powers the Water Wheel, not just the two
     // vanilla Fluid instances). Tag membership is normally bound by the datapack/resource
-    // reload a live Level performs on world load; this project's neoForge.unitTest harness
-    // boots the game far enough to statically register built-ins (Fluids.WATER, etc.) but
-    // never runs that reload, so FluidTags.WATER starts out empty here. Rather than weakening
-    // production code to something the harness can exercise, or deferring this whole test to
-    // the not-yet-built gametest suite (Tasks 15/16) the way Task 9's SmeltingLookupTest defers
-    // its live-RecipeManager case, we bind the exact tag membership a real reload would supply
-    // via the registry's own public bindTags API. This keeps the test exercising the real
-    // production logic (not a fake/mock) against real FluidState objects.
+    // reload a live Level performs on world load, which this plain unit test never runs, so
+    // FluidTags.WATER starts out empty here. Bootstrap.bootStrap() runs vanilla's own static
+    // registration (satisfying BuiltInRegistries' "Not bootstrapped" guard on first touch, since
+    // this module's neoFormVersion-only classpath has no modded harness to do it for us), then
+    // we bind the exact tag membership a real reload would supply via the registry's own public
+    // bindTags API. This keeps the test exercising the real production logic (not a fake/mock)
+    // against real FluidState objects.
     @BeforeAll
     static void bindWaterTagForTest() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
         BuiltInRegistries.FLUID.bindTags(Map.of(
                 FluidTags.WATER, List.of(
                         Fluids.WATER.builtInRegistryHolder(),
