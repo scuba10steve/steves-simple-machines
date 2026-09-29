@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "ssm:block/crusher_top",
+    "side": "ssm:block/crusher_side"
+  }
+}

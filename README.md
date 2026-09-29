@@ -131,6 +131,8 @@ Licensed under the MIT License (`mod_license` in `gradle.properties`).
 - **Game**: [Minecraft](http://www.minecraft.net/) by [Mojang AB](http://mojang.com/)
 - **Mod Loader**: [NeoForge](https://neoforged.net/)
 - Combustion Generator and Solar Panel are adapted from `steves-advanced-storage`'s generator block entities.
+- Block textures for **Smelter** (`device_smelter_bottom/front/side/top`) are sourced from [malcolmriley/unused-textures](https://github.com/malcolmriley/unused-textures) via a [personal fork](https://github.com/scuba10steve/unused-minecraft-textures), used under the [Creative Commons Attribution 4.0 International License (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/).
+- Block textures for **Crusher** (`block_breaker_side/top`) and **Sawmill** (`bronze_sawmill_bottom/front_off/side/top`) are sourced from [Futureazoo/TextureRepository](https://github.com/Futureazoo/TextureRepository), used under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 ## Links
 

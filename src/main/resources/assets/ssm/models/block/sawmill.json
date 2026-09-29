@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "ssm:block/sawmill_front",
+    "down": "ssm:block/sawmill_bottom",
+    "up": "ssm:block/sawmill_top",
+    "north": "ssm:block/sawmill_front",
+    "south": "ssm:block/sawmill_side",
+    "east": "ssm:block/sawmill_side",
+    "west": "ssm:block/sawmill_side"
+  }
+}

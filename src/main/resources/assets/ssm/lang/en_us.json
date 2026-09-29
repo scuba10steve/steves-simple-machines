@@ -1,0 +1,19 @@
+{
+  "itemGroup.ssm": "Steve's Simple Machines",
+
+  "block.ssm.crusher": "Crusher",
+  "block.ssm.sawmill": "Sawmill",
+  "block.ssm.smelter": "Smelter",
+  "block.ssm.combustion_generator": "Combustion Generator",
+  "block.ssm.solar_panel": "Solar Panel",
+  "block.ssm.water_wheel": "Water Wheel",
+  "block.ssm.wind_turbine": "Wind Turbine",
+
+  "item.ssm.crushed_iron": "Crushed Iron",
+  "item.ssm.crushed_gold": "Crushed Gold",
+  "item.ssm.crushed_copper": "Crushed Copper",
+  "item.ssm.sawdust": "Sawdust",
+
+  "jei.ssm.crushing": "Crushing",
+  "jei.ssm.sawing": "Sawing"
+}
