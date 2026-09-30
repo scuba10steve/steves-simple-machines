@@ -107,6 +107,13 @@ public class ProcessingMachineBlockEntity extends BlockEntity implements MenuPro
         super.loadAdditional(tag, registries);
         energyStorage.setEnergy(tag.getInt("energy"));
         inventory.deserializeNBT(registries, tag.getCompound("inventory"));
+        // ItemStackHandler#deserializeNBT resizes the handler to whatever "Size" was saved,
+        // which corrupts blocks placed under an older MachineConfig with a different
+        // outputSlotCount (e.g. the Crusher gained a 2nd output slot after some blocks were
+        // already placed): ProcessingMachineMenu then adds a Slot for an index the resized
+        // handler no longer has, crashing every time the menu opens. Re-assert the current
+        // config's size afterward so stale saved data can never leave the handler undersized.
+        inventory.setSize(1 + config.outputSlotCount());
         state.setProgress(tag.getInt("progress"));
     }
 }
