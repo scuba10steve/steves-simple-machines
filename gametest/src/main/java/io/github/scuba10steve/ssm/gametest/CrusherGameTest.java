@@ -4,12 +4,15 @@ import io.github.scuba10steve.ssm.machine.ProcessingMachineBlockEntity;
 import io.github.scuba10steve.ssm.registry.ModBlocks;
 import io.github.scuba10steve.ssm.registry.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 @GameTestHolder("ssm")
 @PrefixGameTestTemplate(false)
@@ -89,5 +92,39 @@ public class CrusherGameTest {
                     "both output slots must remain exactly 64, nothing duplicated or lost");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void crusherRestoresLegacySizedInventoryWithoutLosingItems(GameTestHelper helper) {
+        // Simulates loading a Crusher placed under an older MachineConfig with only 1 output
+        // slot (2 total: input + 1 output), before the 2-output-slot redesign. deserializeNBT
+        // resizes the handler down to the saved size, then loadAdditional must grow it back to
+        // the current size (3) without losing the items that were just loaded into it.
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.CRUSHER.get());
+        ProcessingMachineBlockEntity be = (ProcessingMachineBlockEntity) helper.getBlockEntity(pos);
+        HolderLookup.Provider registries = helper.getLevel().registryAccess();
+
+        ItemStackHandler legacy = new ItemStackHandler(2);
+        legacy.setStackInSlot(0, new ItemStack(Items.RAW_IRON, 5));
+        legacy.setStackInSlot(1, new ItemStack(Items.IRON_INGOT, 3));
+        CompoundTag saved = new CompoundTag();
+        saved.put("inventory", legacy.serializeNBT(registries));
+        saved.putInt("energy", 1234);
+        saved.putInt("progress", 0);
+
+        be.loadAdditional(saved, registries);
+
+        helper.assertTrue(be.inventory.getSlots() == 3,
+                "expected inventory resized to the current output slot count (3 total)");
+        ItemStack input = be.inventory.getStackInSlot(0);
+        helper.assertTrue(input.is(Items.RAW_IRON) && input.getCount() == 5,
+                "expected input slot contents preserved across resize, was " + input);
+        ItemStack firstOutput = be.inventory.getStackInSlot(1);
+        helper.assertTrue(firstOutput.is(Items.IRON_INGOT) && firstOutput.getCount() == 3,
+                "expected first output slot contents preserved across resize, was " + firstOutput);
+        helper.assertTrue(be.inventory.getStackInSlot(2).isEmpty(),
+                "expected the newly added second output slot to start empty");
+        helper.succeed();
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -113,7 +114,21 @@ public class ProcessingMachineBlockEntity extends BlockEntity implements MenuPro
         // already placed): ProcessingMachineMenu then adds a Slot for an index the resized
         // handler no longer has, crashing every time the menu opens. Re-assert the current
         // config's size afterward so stale saved data can never leave the handler undersized.
-        inventory.setSize(1 + config.outputSlotCount());
+        // ItemStackHandler#setSize does NOT preserve contents (it replaces the whole stacks
+        // list with fresh empties), so the already-deserialized stacks must be captured first
+        // and restored after resizing, or every load would silently wipe the inventory.
+        int expectedSize = 1 + config.outputSlotCount();
+        if (inventory.getSlots() != expectedSize) {
+            int preserveCount = Math.min(inventory.getSlots(), expectedSize);
+            ItemStack[] existing = new ItemStack[preserveCount];
+            for (int i = 0; i < preserveCount; i++) {
+                existing[i] = inventory.getStackInSlot(i);
+            }
+            inventory.setSize(expectedSize);
+            for (int i = 0; i < preserveCount; i++) {
+                inventory.setStackInSlot(i, existing[i]);
+            }
+        }
         state.setProgress(tag.getInt("progress"));
     }
 }
