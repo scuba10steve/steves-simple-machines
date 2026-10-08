@@ -57,5 +57,11 @@ public class SolarGeneratorScreen extends AbstractContainerScreen<SolarGenerator
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font, title, 8, 6, 0x404040, false);
         graphics.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96, 0x404040, false);
+
+        // Title row is the only free horizontal strip across the 176x166 layout — the energy
+        // bar fills nearly the entire vertical band between the title and the inventory label,
+        // leaving no room above/below it for text (see ENERGY_BAR_Y/H above).
+        String energyText = menu.getEnergyStored() + " FE";
+        graphics.drawString(font, energyText, imageWidth - 8 - font.width(energyText), 6, 0x404040, false);
     }
 }
