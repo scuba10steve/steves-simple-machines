@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "ssm:block/wind_turbine" }
+  }
+}
