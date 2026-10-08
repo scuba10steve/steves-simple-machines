@@ -1,0 +1,6 @@
+{
+  "type": "ssm:crushing",
+  "input": { "tag": "c:raw_materials/gold" },
+  "result": { "id": "ssm:crushed_gold", "count": 1 },
+  "output_count": 2
+}

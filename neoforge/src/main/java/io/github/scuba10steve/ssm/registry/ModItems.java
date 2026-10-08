@@ -1,0 +1,50 @@
+package io.github.scuba10steve.ssm.registry;
+
+import io.github.scuba10steve.ssm.ref.RefStrings;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
+
+public class ModItems {
+    public static final DeferredRegister<Item> ITEMS =
+            DeferredRegister.create(BuiltInRegistries.ITEM, RefStrings.MODID);
+
+    public static final Supplier<Item> CRUSHED_IRON = ITEMS.register("crushed_iron", () -> new Item(new Item.Properties()));
+    public static final Supplier<Item> CRUSHED_GOLD = ITEMS.register("crushed_gold", () -> new Item(new Item.Properties()));
+    public static final Supplier<Item> CRUSHED_COPPER = ITEMS.register("crushed_copper", () -> new Item(new Item.Properties()));
+
+    // Plain crafting component (not the generator block) — used as an ingredient in the Solar
+    // Generator's crafting recipe. Not placeable; no BlockItem, no block behind it.
+    public static final Supplier<Item> SOLAR_PANEL = ITEMS.register("solar_panel", () -> new Item(new Item.Properties()));
+
+    public static final Supplier<Item> CRUSHER = ITEMS.register("crusher",
+            () -> new BlockItem(ModBlocks.CRUSHER.get(), new Item.Properties()));
+
+    public static final Supplier<Item> SAWDUST = ITEMS.register("sawdust", () -> new Item(new Item.Properties()));
+
+    public static final Supplier<Item> SAWMILL = ITEMS.register("sawmill",
+            () -> new BlockItem(ModBlocks.SAWMILL.get(), new Item.Properties()));
+
+    public static final Supplier<Item> SMELTER = ITEMS.register("smelter",
+            () -> new BlockItem(ModBlocks.SMELTER.get(), new Item.Properties()));
+
+    public static final Supplier<Item> COMBUSTION_GENERATOR = ITEMS.register("combustion_generator",
+            () -> new BlockItem(ModBlocks.COMBUSTION_GENERATOR.get(), new Item.Properties()));
+
+    public static final Supplier<Item> SOLAR_GENERATOR = ITEMS.register("solar_generator",
+            () -> new BlockItem(ModBlocks.SOLAR_GENERATOR.get(), new Item.Properties()));
+
+    public static final Supplier<Item> WATER_WHEEL = ITEMS.register("water_wheel",
+            () -> new BlockItem(ModBlocks.WATER_WHEEL.get(), new Item.Properties()));
+
+    public static final Supplier<Item> WIND_TURBINE = ITEMS.register("wind_turbine",
+            () -> new BlockItem(ModBlocks.WIND_TURBINE.get(), new Item.Properties()));
+
+    public static void register(IEventBus bus) {
+        ITEMS.register(bus);
+    }
+}

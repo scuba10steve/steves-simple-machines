@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "ssm:block/smelter_front",
+    "down": "ssm:block/smelter_bottom",
+    "up": "ssm:block/smelter_top",
+    "north": "ssm:block/smelter_front",
+    "south": "ssm:block/smelter_side",
+    "east": "ssm:block/smelter_side",
+    "west": "ssm:block/smelter_side"
+  }
+}

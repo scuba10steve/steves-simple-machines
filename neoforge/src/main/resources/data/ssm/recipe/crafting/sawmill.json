@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IAI",
+    "III"
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "A": { "item": "minecraft:iron_axe" }
+  },
+  "result": { "id": "ssm:sawmill", "count": 1 }
+}

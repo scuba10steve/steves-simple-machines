@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "MIT"
+
+[[mods]]
+modId = "ssm"
+version = "${mod_version}"
+displayName = "Steve's Simple Machines"
+description = '''Better power generation and automated ore/wood processing for Minecraft.'''
+authors = "scuba10steve, zerofall, SBlectric"
+
+[[dependencies.ssm]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ssm]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ssm]]
+modId = "jei"
+type = "optional"
+versionRange = "${jei_version_range}"
+ordering = "NONE"
+side = "BOTH"

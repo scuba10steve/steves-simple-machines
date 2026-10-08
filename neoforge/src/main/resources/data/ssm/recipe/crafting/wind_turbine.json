@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FIF",
+    "III",
+    "ISI"
+  ],
+  "key": {
+    "F": { "item": "minecraft:feather" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "id": "ssm:wind_turbine", "count": 1 }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "ssm:sawing",
+  "input": { "item": "minecraft:warped_stem" },
+  "planks_result": { "id": "minecraft:warped_planks" },
+  "planks_count": 6,
+  "sawdust_result": { "id": "ssm:sawdust" },
+  "sawdust_count": 1
+}

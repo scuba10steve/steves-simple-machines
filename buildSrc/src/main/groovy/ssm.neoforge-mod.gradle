@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev'
+    id 'ssm.conventions'
+}
+
+version = rootProject.mod_version
+group = 'io.github.scuba10steve'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = neoforge_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+}
+
+dependencies {
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.27.0.340"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.27.0.340"
+    implementation project(':core')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

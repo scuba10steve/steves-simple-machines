@@ -1,0 +1,8 @@
+plugins {
+    id 'java'
+    id 'ssm.repositories'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}

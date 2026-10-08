@@ -1,0 +1,8 @@
+{
+  "type": "ssm:sawing",
+  "input": { "item": "minecraft:spruce_log" },
+  "planks_result": { "id": "minecraft:spruce_planks" },
+  "planks_count": 6,
+  "sawdust_result": { "id": "ssm:sawdust" },
+  "sawdust_count": 1
+}

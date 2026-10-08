@@ -1,0 +1,57 @@
+package io.github.scuba10steve.ssm.registry;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+
+public class ModCapabilities {
+    public static void register(IEventBus modEventBus) {
+        modEventBus.addListener(ModCapabilities::registerCapabilities);
+    }
+
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.CRUSHER.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.CRUSHER.get(),
+                (be, side) -> be.inventory);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.SAWMILL.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.SAWMILL.get(),
+                (be, side) -> be.inventory);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.SMELTER.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.SMELTER.get(),
+                (be, side) -> be.inventory);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.COMBUSTION_GENERATOR.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.COMBUSTION_GENERATOR.get(),
+                (be, side) -> be.fuelHandler);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.SOLAR_GENERATOR.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.WATER_WHEEL.get(),
+                (be, side) -> be.energyStorage);
+        event.registerBlockEntity(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.WIND_TURBINE.get(),
+                (be, side) -> be.energyStorage);
+    }
+}

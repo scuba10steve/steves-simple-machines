@@ -1,0 +1,29 @@
+plugins {
+    id 'ssm.neoforge-mod'
+}
+
+evaluationDependsOn(':core')
+evaluationDependsOn(':neoforge')
+
+neoForge {
+    runs {
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'ssm'
+        }
+    }
+
+    mods {
+        ssm {
+            sourceSet sourceSets.main
+            modSourceSets.add(providers.provider { project(':core').sourceSets.main })
+            modSourceSets.add(providers.provider { project(':neoforge').sourceSets.main })
+        }
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation project(':neoforge')
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.14.4"
+}
