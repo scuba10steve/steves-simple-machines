@@ -9,11 +9,13 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class WindTurbineScreen extends AbstractContainerScreen<WindTurbineMenu> {
 
-    // Reuses the shared placeholder GUI texture from Task 6 (no dedicated art asset for v1);
-    // the sprite region to the right of the 176x166 visible panel has enough room for the
-    // energy-bar swatch used below (same coordinates as WaterWheelScreen's energy bar).
+    // Wind Turbine has no real slots (only player inventory) — unlike the shared
+    // processing_machine.png, this texture has the vestigial input-slot/progress-arrow art
+    // (baked in for the machine screens' use) painted over, since it would otherwise show as
+    // two non-functional boxes with nothing behind them. Same energy-bar sprite region as
+    // processing_machine.png (kept for CombustionGeneratorScreen's own art).
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "textures/gui/container/processing_machine.png");
+            ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "textures/gui/container/simple_generator.png");
 
     // Actual PNG dimensions — see ProcessingMachineScreen for why the 9-arg GuiGraphics#blit
     // overload (which takes these explicitly) is required instead of the 7-arg convenience
@@ -58,10 +60,13 @@ public class WindTurbineScreen extends AbstractContainerScreen<WindTurbineMenu> 
         graphics.drawString(font, title, 8, 6, 0x404040, false);
         graphics.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96, 0x404040, false);
 
-        // Title row is the only free horizontal strip across the 176x166 layout — the energy
-        // bar fills nearly the entire vertical band between the title and the inventory label,
-        // leaving no room above/below it for text (see ENERGY_BAR_Y/H above).
-        String energyText = menu.getEnergyStored() + " FE";
-        graphics.drawString(font, energyText, imageWidth - 8 - font.width(energyText), 6, 0x404040, false);
+        // No slots to the left of the energy bar on this screen, so this space (freed by
+        // painting over the vestigial slot/arrow art) is used for a stored/capacity/rate
+        // readout instead of the title-row label the slotted screens use.
+        int rate = menu.getCurrentRate();
+        String rateText = rate > 0 ? "Rate: +" + rate + " FE/t" : "Rate: Idle";
+        graphics.drawString(font, "Stored: " + menu.getEnergyStored() + " FE", 8, 20, 0x404040, false);
+        graphics.drawString(font, "Capacity: " + menu.getEnergyCapacity() + " FE", 8, 32, 0x404040, false);
+        graphics.drawString(font, rateText, 8, 44, 0x404040, false);
     }
 }

@@ -18,8 +18,9 @@ import java.util.Arrays;
 public class WindTurbineBlockEntity extends GeneratorBlockEntity {
 
     private boolean currentlyGenerating;
+    private int currentRate;
 
-    // ContainerData slots: 0-1 = energy (lo/hi), 2-3 = capacity (lo/hi), 4 = isGenerating (0/1)
+    // ContainerData slots: 0-1 = energy (lo/hi), 2-3 = capacity (lo/hi), 4 = currentRate
     public final ContainerData containerData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -28,7 +29,7 @@ public class WindTurbineBlockEntity extends GeneratorBlockEntity {
                 case 1 -> energyHi();
                 case 2 -> capacityLo();
                 case 3 -> capacityHi();
-                case 4 -> currentlyGenerating ? 1 : 0;
+                case 4 -> currentRate;
                 default -> 0;
             };
         }
@@ -49,6 +50,10 @@ public class WindTurbineBlockEntity extends GeneratorBlockEntity {
 
     public boolean isGenerating() {
         return currentlyGenerating;
+    }
+
+    public int getCurrentRate() {
+        return currentRate;
     }
 
     @Override
@@ -73,6 +78,7 @@ public class WindTurbineBlockEntity extends GeneratorBlockEntity {
                 SsmConfig.WIND_TURBINE_MIN_FREE_NEIGHBORS.get());
 
         be.currentlyGenerating = exposed && be.generateAndMarkChanged(SsmConfig.WIND_TURBINE_GENERATION_RATE.get());
+        be.currentRate = be.currentlyGenerating ? SsmConfig.WIND_TURBINE_GENERATION_RATE.get() : 0;
 
         be.pushEnergyToNeighbors(level, pos, SsmConfig.WIND_TURBINE_MAX_OUTPUT.get());
     }

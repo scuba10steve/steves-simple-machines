@@ -18,8 +18,9 @@ import java.util.Arrays;
 public class WaterWheelBlockEntity extends GeneratorBlockEntity {
 
     private boolean currentlyGenerating;
+    private int currentRate;
 
-    // ContainerData slots: 0-1 = energy (lo/hi), 2-3 = capacity (lo/hi), 4 = isGenerating (0/1)
+    // ContainerData slots: 0-1 = energy (lo/hi), 2-3 = capacity (lo/hi), 4 = currentRate
     public final ContainerData containerData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -28,7 +29,7 @@ public class WaterWheelBlockEntity extends GeneratorBlockEntity {
                 case 1 -> energyHi();
                 case 2 -> capacityLo();
                 case 3 -> capacityHi();
-                case 4 -> currentlyGenerating ? 1 : 0;
+                case 4 -> currentRate;
                 default -> 0;
             };
         }
@@ -51,6 +52,10 @@ public class WaterWheelBlockEntity extends GeneratorBlockEntity {
         return currentlyGenerating;
     }
 
+    public int getCurrentRate() {
+        return currentRate;
+    }
+
     @Override
     public Component getDisplayName() {
         return Component.translatable("block.ssm.water_wheel");
@@ -70,6 +75,7 @@ public class WaterWheelBlockEntity extends GeneratorBlockEntity {
                         .toList());
 
         be.currentlyGenerating = adjacentWater && be.generateAndMarkChanged(SsmConfig.WATER_WHEEL_GENERATION_RATE.get());
+        be.currentRate = be.currentlyGenerating ? SsmConfig.WATER_WHEEL_GENERATION_RATE.get() : 0;
 
         be.pushEnergyToNeighbors(level, pos, SsmConfig.WATER_WHEEL_MAX_OUTPUT.get());
     }

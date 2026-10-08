@@ -55,8 +55,8 @@ public class WaterWheelMenu extends AbstractContainerMenu {
         return (containerData.get(3) << 16) | (containerData.get(2) & 0xFFFF);
     }
 
-    public boolean getIsGenerating() {
-        return containerData.get(4) != 0;
+    public int getCurrentRate() {
+        return containerData.get(4);
     }
 
     @Override
