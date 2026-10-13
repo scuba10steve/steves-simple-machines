@@ -1,5 +1,9 @@
 # Steve's Simple Machines (SSM)
 
+[![CI](https://github.com/scuba10steve/steves-simple-machines/actions/workflows/ci.yml/badge.svg)](https://github.com/scuba10steve/steves-simple-machines/actions/workflows/ci.yml)
+[![Modrinth](https://img.shields.io/modrinth/dt/spXMRUYO?logo=modrinth&label=Modrinth)](https://modrinth.com/mod/spXMRUYO)
+[![CurseForge](https://img.shields.io/curseforge/dt/1733720?logo=curseforge&label=CurseForge)](https://www.curseforge.com/minecraft/mc-mods/steves-simple-machines)
+
 Better power generation and automated ore/wood processing for Minecraft. Steve's Simple Machines adds three
 FE-powered processing machines (Crusher, Sawmill, Smelter) and four generators (Combustion, Solar, Water
 Wheel, Wind Turbine) — a small, focused automation layer that plugs into NeoForge's standard Forge Energy (FE)
@@ -135,7 +139,7 @@ game restart (or config reload) to take effect.
 
 ## License
 
-Licensed under the MIT License (`mod_license` in `gradle.properties`).
+This Open Source project is licensed under the MIT License (see [LICENSE](LICENSE)).
 
 ## Credits
 
@@ -150,3 +154,5 @@ Licensed under the MIT License (`mod_license` in `gradle.properties`).
 ## Links
 
 - [GitHub Repository](https://github.com/scuba10steve/steves-simple-machines)
+- [Modrinth](https://modrinth.com/mod/spXMRUYO)
+- [CurseForge](https://www.curseforge.com/minecraft/mc-mods/steves-simple-machines)

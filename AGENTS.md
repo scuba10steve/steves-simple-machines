@@ -174,9 +174,10 @@ steves-simple-machines/
 
 * **Version location:** `mod_version` in `gradle.properties` is the single source of truth for the mod's version
   (currently `0.1.0`).
-* **No release automation yet:** Unlike `steves-simple-storage`, this repository does not yet have `bump-version` or
-  `release` GitHub Actions workflows — `.github/workflows/ci.yml` only builds and runs the gametest suite on every
-  push. Until such workflows exist, bump `mod_version` manually as part of a release commit, tag the commit
-  (`vX.Y.Z`), and record the change in `CHANGELOG.md` (see `cliff.toml` for the changelog generation convention).
-* **If/when release automation is added,** mirror `steves-simple-storage`'s `bump-version.yml` / `release.yml`
-  pattern rather than inventing a new one, and update this section accordingly.
+* **Release automation:** mirrors `steves-simple-storage`'s pattern. `.github/workflows/bump-version.yml` is a
+  manual `workflow_dispatch` that bumps `mod_version` in `gradle.properties` and commits/pushes the change.
+  `.github/workflows/changelog.yml` regenerates `CHANGELOG.md` via git-cliff on every push to `main`.
+  `.github/workflows/release.yml` is a manual `workflow_dispatch` that builds, runs gametests, generates the
+  release-notes body via git-cliff, creates a GitHub Release, and publishes `neoforge/build/libs/ssm-${version}.jar`
+  to both Modrinth and CurseForge via `Kir-Antipov/mc-publish`.
+* **Changelog conventions:** see `cliff.toml`'s `commit_parsers` for how commit messages map to changelog groups.
