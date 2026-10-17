@@ -5,11 +5,13 @@ import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.SolarGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.WaterWheelBlockEntity;
 import io.github.scuba10steve.ssm.generator.WindTurbineBlockEntity;
+import io.github.scuba10steve.ssm.ref.RefStrings;
 import io.github.scuba10steve.ssm.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -166,6 +168,20 @@ public class GeneratorGameTest {
             helper.assertTrue(!be.isGenerating(), "expected wheel to not report generating when buffer is full");
             helper.succeed();
         });
+    }
+
+    @GameTest(template = "empty")
+    public static void waterWheelRecipeIsNotLoadedWhileDisabled(GameTestHelper helper) {
+        // Regression test for the ssm:feature_enabled recipe condition: ModBlocks.WATER_WHEEL_STATE
+        // is disabled (texture pending) today, so NeoForge's recipe-loading pipeline must exclude
+        // ssm:water_wheel entirely from the RecipeManager rather than merely hiding it from the UI.
+        ResourceLocation waterWheelRecipeId =
+                ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "water_wheel");
+
+        helper.assertTrue(
+                helper.getLevel().getRecipeManager().byKey(waterWheelRecipeId).isEmpty(),
+                "expected ssm:water_wheel crafting recipe to not be loaded while the feature is disabled");
+        helper.succeed();
     }
 
     // --- Wind Turbine ---
