@@ -18,6 +18,7 @@ public class Ssm {
         ModRecipes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModCapabilities.register(modEventBus);
+        ModConditions.register(modEventBus);
         ModClientSetup.register(modEventBus);
     }
 }
