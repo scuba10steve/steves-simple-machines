@@ -174,13 +174,22 @@ public class GeneratorGameTest {
     public static void waterWheelRecipeIsNotLoadedWhileDisabled(GameTestHelper helper) {
         // Regression test for the ssm:feature_enabled recipe condition: ModBlocks.WATER_WHEEL_STATE
         // is disabled (texture pending) today, so NeoForge's recipe-loading pipeline must exclude
-        // ssm:water_wheel entirely from the RecipeManager rather than merely hiding it from the UI.
+        // ssm:crafting/water_wheel entirely from the RecipeManager rather than merely hiding it from
+        // the UI. Recipe ids are derived from the file path under data/<namespace>/recipe/ (here,
+        // crafting/water_wheel.json), not from the result item's id inside the JSON.
         ResourceLocation waterWheelRecipeId =
-                ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "water_wheel");
+                ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "crafting/water_wheel");
+        ResourceLocation windTurbineRecipeId =
+                ResourceLocation.fromNamespaceAndPath(RefStrings.MODID, "crafting/wind_turbine");
 
         helper.assertTrue(
                 helper.getLevel().getRecipeManager().byKey(waterWheelRecipeId).isEmpty(),
-                "expected ssm:water_wheel crafting recipe to not be loaded while the feature is disabled");
+                "expected ssm:crafting/water_wheel crafting recipe to not be loaded while the feature is disabled");
+        // Positive control: proves the RecipeManager lookup itself works and isn't just returning
+        // empty for everything (e.g. from a mislabeled key or an empty recipe manager).
+        helper.assertTrue(
+                helper.getLevel().getRecipeManager().byKey(windTurbineRecipeId).isPresent(),
+                "expected ssm:crafting/wind_turbine crafting recipe to be loaded as an always-enabled control");
         helper.succeed();
     }
 

@@ -57,8 +57,7 @@ public class ModBlocks {
                     BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
 
     // Water Wheel's texture isn't finished yet — disabled hides it from the creative tab, JEI,
-    // and its crafting recipe (see docs/superpowers/specs/2026-10-15-block-item-entity-feature-state-design.md)
-    // until the real texture lands, at which point this flips to true.
+    // and its crafting recipe until the real texture lands, at which point this flips to true.
     public static final BlockItemEntityFeatureState WATER_WHEEL_STATE =
             BlockItemEntityFeatureState.of(RefStrings.MODID, "water_wheel", false,
                     ModItems.WATER_WHEEL, ModBlocks.WATER_WHEEL, ModBlockEntities.WATER_WHEEL);

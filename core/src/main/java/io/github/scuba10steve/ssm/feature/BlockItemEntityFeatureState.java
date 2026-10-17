@@ -6,8 +6,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -31,7 +33,7 @@ public final class BlockItemEntityFeatureState {
             Supplier<? extends BlockEntityType<?>> blockEntityType) {
         this.id = id;
         this.enabled = enabled;
-        this.item = item;
+        this.item = Objects.requireNonNull(item, "item");
         this.block = block;
         this.blockEntityType = blockEntityType;
         if (BY_ITEM_ID.putIfAbsent(id, this) != null) {
@@ -69,6 +71,6 @@ public final class BlockItemEntityFeatureState {
     }
 
     public static Collection<BlockItemEntityFeatureState> all() {
-        return BY_ITEM_ID.values();
+        return Collections.unmodifiableCollection(BY_ITEM_ID.values());
     }
 }
