@@ -1,5 +1,6 @@
 package io.github.scuba10steve.ssm.compat.jei;
 
+import io.github.scuba10steve.ssm.feature.BlockItemEntityFeatureState;
 import io.github.scuba10steve.ssm.recipe.CrushingRecipe;
 import io.github.scuba10steve.ssm.recipe.SawingRecipe;
 import io.github.scuba10steve.ssm.ref.RefStrings;
@@ -8,9 +9,11 @@ import io.github.scuba10steve.ssm.registry.ModRecipes;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -54,5 +57,15 @@ public class SsmJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.SAWMILL.get()), SawingCategory.TYPE);
         // Smelter reuses vanilla's own Smelting category rather than a new ssm category:
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.SMELTER.get()), RecipeTypes.SMELTING);
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        for (BlockItemEntityFeatureState state : BlockItemEntityFeatureState.all()) {
+            if (!state.isEnabled()) {
+                jeiRuntime.getIngredientManager().removeIngredientsAtRuntime(
+                        VanillaTypes.ITEM_STACK, List.of(new ItemStack(state.item())));
+            }
+        }
     }
 }

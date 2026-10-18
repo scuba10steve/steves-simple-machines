@@ -1,5 +1,6 @@
 package io.github.scuba10steve.ssm.registry;
 
+import io.github.scuba10steve.ssm.feature.BlockItemEntityFeatureState;
 import io.github.scuba10steve.ssm.generator.CombustionGeneratorBlockEntity;
 import io.github.scuba10steve.ssm.generator.GeneratorBlock;
 import io.github.scuba10steve.ssm.generator.SolarGeneratorBlockEntity;
@@ -54,6 +55,12 @@ public class ModBlocks {
                     WaterWheelBlockEntity::new,
                     WaterWheelBlockEntity::tick,
                     BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()));
+
+    // Water Wheel's texture isn't finished yet — disabled hides it from the creative tab, JEI,
+    // and its crafting recipe until the real texture lands, at which point this flips to true.
+    public static final BlockItemEntityFeatureState WATER_WHEEL_STATE =
+            BlockItemEntityFeatureState.of(RefStrings.MODID, "water_wheel", false,
+                    ModItems.WATER_WHEEL, ModBlocks.WATER_WHEEL, ModBlockEntities.WATER_WHEEL);
 
     public static final Supplier<GeneratorBlock<WindTurbineBlockEntity>> WIND_TURBINE = BLOCKS.register("wind_turbine", () ->
             new GeneratorBlock<>(

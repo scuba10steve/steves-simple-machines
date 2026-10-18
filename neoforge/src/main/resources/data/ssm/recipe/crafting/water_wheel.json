@@ -1,4 +1,7 @@
 {
+  "neoforge:conditions": [
+    { "type": "ssm:feature_enabled", "item": "ssm:water_wheel" }
+  ],
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "PPP",

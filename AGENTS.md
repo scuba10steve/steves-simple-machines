@@ -47,9 +47,10 @@ steves-simple-machines/
                                     MachineInventory (inventory abstraction), ProcessingMachineState (depends on
                                     MachineInventory instead of NeoForge's ItemStackHandler directly)
       generator/                   CombustionBurnState, AdjacentWaterCheck, WindExposureCheck
-    src/test/java/io/github/scuba10steve/ssm/   19 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
+      feature/BlockItemEntityFeatureState.java  Developer-controlled feature-readiness flag
+    src/test/java/io/github/scuba10steve/ssm/   25 unit tests: SmeltingLookupTest, ProcessingMachineStateTest,
                                     CombustionBurnStateTest, AdjacentWaterCheckTest, WindExposureCheckTest,
-                                    FakeMachineInventory (test fixture)
+                                    BlockItemEntityFeatureStateTest, FakeMachineInventory (test fixture)
 
   neoforge/                        NeoForge runtime module — everything not listed under core/ above
     build.gradle                   Applies ssm.neoforge-mod (full modded classpath); a `coreClasses` resolvable
@@ -60,7 +61,8 @@ steves-simple-machines/
       config/SsmConfig.java        ModConfigSpec; written to config/ssm-common.toml
       energy/SimpleEnergyStorage.java  Shared FE buffer used by every machine and generator
       registry/                    DeferredRegister holders: ModBlocks, ModItems, ModBlockEntities,
-                                    ModMenuTypes, ModRecipes, ModCreativeTabs, ModCapabilities, ModClientSetup
+                                    ModMenuTypes, ModRecipes, ModCreativeTabs, ModCapabilities, ModClientSetup,
+                                    ModConditions; also home to the FeatureEnabledCondition recipe condition
       recipe/                      CrushingRecipe, SawingRecipe (Smelter reuses vanilla minecraft:smelting)
       machine/                     MachineConfig, MachineConfigs (CRUSHER, SMELTER, SAWMILL),
                                     ProcessingMachineBlock, ProcessingMachineBlockEntity, ProcessingMachineMenu,
@@ -75,8 +77,8 @@ steves-simple-machines/
       META-INF/neoforge.mods.toml
       data/ssm/recipe/              crushing/, sawing/, smelting/, crafting/
       assets/ssm/textures/gui/      Shared processing-machine GUI texture
-    src/test/java/io/github/scuba10steve/ssm/   9 unit tests: SimpleEnergyStorageTest, CrushingRecipeTest,
-                                    SawingRecipeTest
+    src/test/java/io/github/scuba10steve/ssm/   12 unit tests: SimpleEnergyStorageTest, CrushingRecipeTest,
+                                    SawingRecipeTest, FeatureEnabledConditionTest
 
   gametest/                        Separate Gradle subproject depending on both :core and :neoforge
                                     (ModDevGradle's moddev plugin needs one neoForge{} extension per project, so
@@ -85,7 +87,7 @@ steves-simple-machines/
                                     ssm mod
     src/main/java/io/github/scuba10steve/ssm/gametest/
                                     CrusherGameTest, SawmillGameTest, SmelterGameTest, GeneratorGameTest,
-                                    BlockDropGameTest (24 gametests total)
+                                    BlockDropGameTest (26 gametests total)
 
   docs/dev/                        This documentation
   AGENTS.md, README.md, CHANGELOG.md, cliff.toml
